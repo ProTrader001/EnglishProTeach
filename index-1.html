@@ -1,0 +1,2467 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Lingua Path — Ingliz tilini o'rganish</title>
+<meta name="description" content="0 dan C1 darajagacha ingliz tilini o'rganish platformasi">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" onerror="this.remove()">
+<style>
+/* ==========================================================================
+   LINGUA PATH — DESIGN TOKENS
+   Palette: deep indigo (focus/trust) + amber flame (streak/achievement)
+   Display: Fraunces (characterful serif) / Body: Inter / Data: JetBrains Mono
+   ========================================================================== */
+:root{
+  --bg:#F5F6FB;
+  --surface:#FFFFFF;
+  --surface-2:#EEF0F9;
+  --border:#E1E4F0;
+  --text:#1B1D2E;
+  --muted:#6A6F8C;
+  --primary:#2D3282;
+  --primary-2:#454BB0;
+  --primary-soft:#E9EAFA;
+  --accent:#FF9F1C;
+  --accent-soft:#FFEED2;
+  --success:#0AA37A;
+  --success-soft:#DCF6EE;
+  --danger:#E24C5B;
+  --danger-soft:#FBE3E6;
+  --radius:16px;
+  --radius-sm:10px;
+  --shadow:0 8px 24px -8px rgba(29,32,66,.14);
+  --shadow-lg:0 20px 48px -12px rgba(29,32,66,.22);
+  --font-display:'Fraunces', Georgia, serif;
+  --font-body:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:'JetBrains Mono', 'Courier New', monospace;
+  --sidebar-w:264px;
+  color-scheme: light;
+}
+body.dark{
+  --bg:#0F1120;
+  --surface:#181B30;
+  --surface-2:#1F2340;
+  --border:#2B2F52;
+  --text:#EDEEFA;
+  --muted:#9498BD;
+  --primary:#7A80E8;
+  --primary-2:#9498F5;
+  --primary-soft:#232760;
+  --accent:#FFB54D;
+  --accent-soft:#3A2C10;
+  --success:#3FD9A8;
+  --success-soft:#123829;
+  --danger:#FF7A88;
+  --danger-soft:#3B1620;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  transition:background .3s ease,color .3s ease;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;color:inherit}
+a{color:inherit}
+::selection{background:var(--accent-soft);color:var(--text)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hidden{display:none !important}
+.scrollbar-thin::-webkit-scrollbar{width:8px;height:8px}
+.scrollbar-thin::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
+
+/* ---------- App shell ---------- */
+.app-shell{display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{
+  width:var(--sidebar-w);
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;
+  z-index:100;
+  transition:transform .3s ease, background .3s ease;
+}
+.sidebar-brand{
+  display:flex;align-items:center;gap:10px;
+  padding:22px 20px 16px;
+}
+.sidebar-brand .flame{
+  width:38px;height:38px;border-radius:11px;
+  background:linear-gradient(150deg,var(--accent),#FF6B35);
+  display:flex;align-items:center;justify-content:center;
+  font-size:19px;box-shadow:0 6px 16px -4px rgba(255,159,28,.55);
+  flex-shrink:0;
+}
+.sidebar-brand h1{font-family:var(--font-display);font-size:19px;font-weight:700;letter-spacing:-.01em}
+.sidebar-brand span{display:block;font-size:11px;color:var(--muted);font-weight:500;letter-spacing:.02em}
+.sidebar-nav{flex:1;overflow-y:auto;padding:6px 12px 12px}
+.nav-group-label{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:16px 10px 6px}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  width:100%;padding:10px 12px;border-radius:11px;
+  font-size:14px;font-weight:600;color:var(--muted);
+  transition:all .15s ease;text-align:left;
+}
+.nav-item .ic{font-size:17px;width:20px;text-align:center;flex-shrink:0}
+.nav-item:hover{background:var(--surface-2);color:var(--text)}
+.nav-item.active{background:var(--primary-soft);color:var(--primary)}
+body.dark .nav-item.active{color:#C7CAFF}
+.sidebar-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.streak-chip{display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;font-family:var(--font-mono)}
+
+/* Topbar (mobile) */
+.topbar{
+  display:none;position:sticky;top:0;z-index:90;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:12px 14px;align-items:center;justify-content:space-between;
+}
+.icon-btn{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--surface-2)}
+.icon-btn:hover{background:var(--border)}
+
+/* Main content */
+.main-wrap{margin-left:var(--sidebar-w);flex:1;min-width:0;display:flex;flex-direction:column}
+.main-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 32px;border-bottom:1px solid var(--border);
+  background:var(--surface);position:sticky;top:0;z-index:50;
+}
+.main-header h2{font-family:var(--font-display);font-size:26px;font-weight:700;letter-spacing:-.01em}
+.main-header p{font-size:13px;color:var(--muted);margin-top:2px}
+.header-actions{display:flex;gap:10px;align-items:center}
+.main-content{padding:28px 32px 80px;max-width:1180px;width:100%}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 20px;border-radius:12px;font-weight:700;font-size:14px;
+  transition:transform .12s ease, box-shadow .12s ease, background .15s ease;
+  white-space:nowrap;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 8px 20px -8px rgba(45,50,130,.55)}
+.btn-primary:hover{background:var(--primary-2)}
+.btn-accent{background:var(--accent);color:#241300;box-shadow:0 8px 20px -8px rgba(255,159,28,.55)}
+.btn-accent:hover{filter:brightness(1.06)}
+.btn-ghost{background:var(--surface-2);color:var(--text)}
+.btn-ghost:hover{background:var(--border)}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn-sm{padding:7px 13px;font-size:12.5px;border-radius:9px}
+.btn-danger{background:var(--danger-soft);color:var(--danger)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.btn-icon-only{padding:9px;border-radius:10px}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:background .3s ease, border-color .3s ease}
+.card-hover:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1000px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+
+/* Dashboard */
+.hero-path{
+  background:linear-gradient(135deg,var(--primary) 0%, #4247A8 55%, #5A5FC7 100%);
+  border-radius:20px;padding:28px 30px;color:#fff;position:relative;overflow:hidden;margin-bottom:22px;
+}
+.hero-path::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 85% 20%, rgba(255,159,28,.35), transparent 55%);
+}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;position:relative;flex-wrap:wrap}
+.hero-top h3{font-family:var(--font-display);font-size:24px;font-weight:700}
+.hero-top p{font-size:13.5px;opacity:.85;margin-top:4px;max-width:420px}
+.hero-stat{text-align:right}
+.hero-stat b{font-family:var(--font-mono);font-size:28px;display:block;line-height:1}
+.hero-stat span{font-size:11px;opacity:.8;text-transform:uppercase;letter-spacing:.06em}
+.level-trail{display:flex;align-items:center;gap:4px;margin-top:26px;position:relative;overflow-x:auto;padding-bottom:6px}
+.trail-node{
+  display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;min-width:74px;position:relative;
+}
+.trail-dot{
+  width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-weight:700;font-size:13px;border:3px solid rgba(255,255,255,.3);
+  background:rgba(255,255,255,.08);transition:all .2s ease;
+}
+.trail-node.done .trail-dot{background:var(--success);border-color:#fff}
+.trail-node.current .trail-dot{background:var(--accent);border-color:#fff;color:#241300;box-shadow:0 0 0 6px rgba(255,159,28,.28);animation:pulseGlow 2s infinite}
+.trail-node.locked .trail-dot{opacity:.5}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 6px rgba(255,159,28,.28)}50%{box-shadow:0 0 0 10px rgba(255,159,28,.12)}}
+.trail-node span{font-size:11px;font-weight:600;opacity:.85}
+.trail-line{position:absolute;top:23px;left:50%;width:100%;height:3px;background:rgba(255,255,255,.22);z-index:-1}
+.trail-node:last-child .trail-line{display:none}
+.trail-node.done .trail-line{background:var(--success)}
+
+.stat-card{display:flex;flex-direction:column;gap:8px}
+.stat-card .top{display:flex;justify-content:space-between;align-items:center}
+.stat-card .ic-badge{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.stat-card b{font-family:var(--font-mono);font-size:26px}
+.stat-card .lbl{font-size:12.5px;color:var(--muted);font-weight:600}
+.progress-bar{height:8px;border-radius:6px;background:var(--surface-2);overflow:hidden}
+.progress-bar > i{display:block;height:100%;background:var(--accent);border-radius:6px;transition:width .4s ease}
+
+.section-title{font-family:var(--font-display);font-size:19px;font-weight:700;margin:26px 0 12px;display:flex;align-items:center;gap:8px}
+.section-title:first-child{margin-top:0}
+
+/* Chart canvas card */
+.chart-card canvas{width:100%!important;height:180px!important}
+
+/* Badges/pills */
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:99px;font-size:11.5px;font-weight:700}
+.pill-primary{background:var(--primary-soft);color:var(--primary)}
+body.dark .pill-primary{color:#C7CAFF}
+.pill-success{background:var(--success-soft);color:var(--success)}
+.pill-accent{background:var(--accent-soft);color:#B05E00}
+body.dark .pill-accent{color:var(--accent)}
+.pill-danger{background:var(--danger-soft);color:var(--danger)}
+
+/* Level cards */
+.level-card{position:relative;text-align:center;padding:26px 16px}
+.level-card .badge-num{font-family:var(--font-display);font-size:34px;font-weight:900;color:var(--primary)}
+.level-card.locked{opacity:.55}
+.level-card .lock-ic{position:absolute;top:14px;right:14px;font-size:16px}
+
+/* Alphabet */
+.letter-card{text-align:center;padding:18px 10px;cursor:pointer}
+.letter-card .big{font-family:var(--font-display);font-size:34px;font-weight:800;color:var(--primary)}
+.letter-card .ipa{font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-top:2px}
+.letter-card .ex{font-size:12px;margin-top:6px;color:var(--muted)}
+
+/* Vocabulary */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip-filter{padding:8px 14px;border-radius:99px;background:var(--surface-2);font-size:13px;font-weight:600;color:var(--muted);border:1.5px solid transparent}
+.chip-filter.active{background:var(--primary);color:#fff}
+.search-input{width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);font-size:14px}
+.word-card{display:flex;flex-direction:column;gap:8px}
+.word-card .wtop{display:flex;justify-content:space-between;align-items:flex-start}
+.word-card .en{font-family:var(--font-display);font-weight:700;font-size:19px}
+.word-card .ipa{font-family:var(--font-mono);color:var(--muted);font-size:12px}
+.word-card .uz{color:var(--primary);font-weight:600;font-size:14px}
+.word-card .ex{font-size:12.5px;color:var(--muted);font-style:italic;border-left:2px solid var(--border);padding-left:8px;margin-top:2px}
+.word-actions{display:flex;gap:6px;margin-top:6px}
+
+/* Grammar */
+.gtopic-card{cursor:pointer}
+.gtopic-card .top-row{display:flex;justify-content:space-between;align-items:center}
+table.gtable{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+table.gtable th,table.gtable td{border:1px solid var(--border);padding:8px 10px;text-align:left}
+table.gtable th{background:var(--surface-2);font-weight:700}
+.ex-line{background:var(--surface-2);border-radius:10px;padding:10px 14px;font-size:13.5px;margin:6px 0}
+.exercise-block{margin-top:16px;padding:16px;border-radius:14px;background:var(--surface-2)}
+.fill-input{border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13.5px;width:120px;background:var(--surface);margin:0 4px}
+.fill-input.correct{border-color:var(--success);background:var(--success-soft)}
+.fill-input.wrong{border-color:var(--danger);background:var(--danger-soft)}
+
+/* Speaking / listening / mic */
+.mic-btn{
+  width:96px;height:96px;border-radius:50%;background:var(--danger);color:#fff;font-size:34px;
+  display:flex;align-items:center;justify-content:center;margin:20px auto;box-shadow:0 12px 30px -10px rgba(226,76,91,.6);
+  transition:all .2s ease;
+}
+.mic-btn.listening{animation:micPulse 1.2s infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(226,76,91,.5)}50%{box-shadow:0 0 0 22px rgba(226,76,91,0)}}
+.result-box{border-radius:14px;padding:16px;margin-top:14px}
+.score-ring{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;font-family:var(--font-mono);font-weight:800;font-size:26px;position:relative}
+
+/* Flashcards */
+.flash-stage{perspective:1400px;max-width:420px;margin:0 auto}
+.flash-card{position:relative;width:100%;height:260px;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,.2,.2,1);cursor:pointer}
+.flash-card.flipped{transform:rotateY(180deg)}
+.flash-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;text-align:center;box-shadow:var(--shadow)}
+.flash-front{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff}
+.flash-back{background:var(--accent);color:#241300;transform:rotateY(180deg)}
+.flash-face .big{font-family:var(--font-display);font-size:28px;font-weight:800}
+
+/* Quiz */
+.quiz-opt{display:block;width:100%;text-align:left;padding:13px 16px;border-radius:12px;border:1.5px solid var(--border);margin-bottom:9px;font-weight:600;font-size:14px;transition:all .15s ease}
+.quiz-opt:hover{border-color:var(--primary)}
+.quiz-opt.selected{border-color:var(--primary);background:var(--primary-soft)}
+.quiz-opt.correct{border-color:var(--success);background:var(--success-soft)}
+.quiz-opt.wrong{border-color:var(--danger);background:var(--danger-soft)}
+.quiz-progress{height:6px;border-radius:6px;background:var(--surface-2);overflow:hidden;margin-bottom:18px}
+
+/* Chat */
+.chat-window{height:440px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:6px}
+.msg{max-width:78%;padding:11px 15px;border-radius:16px;font-size:14px;line-height:1.5}
+.msg.bot{background:var(--surface-2);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.user{background:var(--primary);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chat-input-row{display:flex;gap:8px;margin-top:14px}
+.chat-input-row input{flex:1;padding:13px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface)}
+
+/* Games */
+.hangman-word{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:20px 0;font-family:var(--font-mono);font-size:28px;font-weight:700}
+.hangman-word span{border-bottom:3px solid var(--border);min-width:26px;text-align:center}
+.kbd-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:520px;margin:0 auto}
+.kbd-key{width:36px;height:40px;border-radius:8px;background:var(--surface-2);font-weight:700;display:flex;align-items:center;justify-content:center}
+.kbd-key.used-good{background:var(--success-soft);color:var(--success)}
+.kbd-key.used-bad{background:var(--danger-soft);color:var(--danger);opacity:.5}
+.memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:480px;margin:0 auto}
+.memory-tile{aspect-ratio:1;border-radius:12px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;text-align:center;padding:4px;color:#fff;cursor:pointer;transition:transform .3s}
+.memory-tile.revealed{background:var(--surface-2);color:var(--text)}
+.memory-tile.matched{background:var(--success-soft);color:var(--success);opacity:.7}
+.sentence-pool{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;min-height:44px;padding:10px;border:1.5px dashed var(--border);border-radius:12px}
+.sentence-chip{padding:8px 14px;background:var(--primary-soft);color:var(--primary);border-radius:9px;font-weight:700;font-size:13.5px;cursor:pointer}
+body.dark .sentence-chip{color:#C7CAFF}
+.sentence-answer{display:flex;flex-wrap:wrap;gap:8px;min-height:50px;padding:10px;background:var(--surface-2);border-radius:12px;margin-bottom:10px}
+
+/* Notebook */
+.note-item{border-left:3px solid var(--accent);padding-left:12px}
+
+/* Conversation */
+.dialogue-line{display:flex;gap:10px;margin-bottom:12px;align-items:flex-start}
+.dialogue-line .avatar{width:34px;height:34px;border-radius:50%;background:var(--primary-soft);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.dialogue-line.me{flex-direction:row-reverse}
+.dialogue-line.me .bubble{background:var(--primary);color:#fff}
+.bubble{background:var(--surface-2);padding:10px 14px;border-radius:14px;font-size:14px;max-width:75%}
+
+/* Toast */
+#toast-wrap{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+.toast{background:var(--text);color:var(--bg);padding:13px 18px;border-radius:12px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow-lg);animation:toastIn .3s ease;max-width:300px}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,11,20,.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.modal-box{background:var(--surface);border-radius:20px;padding:26px;max-width:480px;width:100%;max-height:86vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+
+/* empty state */
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-state .ic{font-size:42px;margin-bottom:10px}
+
+/* Mobile nav drawer */
+.sidebar-scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99}
+
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-scrim.show{display:block}
+  .main-wrap{margin-left:0}
+  .topbar{display:flex}
+  .main-header{padding:16px 18px}
+  .main-header h2{font-size:20px}
+  .main-content{padding:18px 16px 70px}
+  .hero-path{padding:20px}
+}
+</style>
+</head>
+<body>
+<div id="toast-wrap"></div>
+
+<div class="app-shell">
+  <div class="sidebar-scrim" id="scrim" onclick="closeSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="flame">🔥</div>
+      <div>
+        <h1>Lingua Path</h1>
+        <span>0 → C1 yo'lida</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav scrollbar-thin" id="navList"></nav>
+    <div class="sidebar-foot">
+      <div class="streak-chip"><span>🔥</span><span id="sideStreak">0</span></div>
+      <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="Mavzuni almashtirish">🌙</button>
+    </div>
+  </aside>
+
+  <div class="main-wrap">
+    <div class="topbar">
+      <button class="icon-btn" onclick="openSidebar()">☰</button>
+      <h1 style="font-family:var(--font-display);font-size:17px;font-weight:700">Lingua Path</h1>
+      <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+    </div>
+
+    <header class="main-header">
+      <div>
+        <h2 id="pageTitle">Dashboard</h2>
+        <p id="pageSubtitle">Bugungi taraqqiyotingiz</p>
+      </div>
+      <div class="header-actions">
+        <span class="pill pill-accent" id="xpPill">⭐ 0 XP</span>
+        <button class="btn btn-ghost btn-sm hidden" id="onlineBadge">🌐 Onlayn</button>
+      </div>
+    </header>
+
+    <main class="main-content" id="mainContent"></main>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+
+<script>
+/* ==========================================================================
+   LINGUA PATH — APPLICATION SCRIPT
+   Single-file, offline-first, localStorage-persisted English learning app.
+   ========================================================================== */
+
+/* ---------------------------- Storage layer ---------------------------- */
+const STORAGE_KEY = 'linguaPathState_v1';
+
+function defaultState(){
+  return {
+    theme: 'light',
+    xp: 0,
+    streak: 0,
+    lastActiveDate: null,
+    dailyGoalWords: 10,
+    levels: ['A0','A1','A2','B1','B2','C1'],
+    unlockedIndex: 0, // index into levels array, current unlocked max
+    currentLevel: 'A0',
+    learnedWords: {},      // wordId -> true
+    favoriteWords: {},      // wordId -> true
+    notebook: [],            // {id, wordId, en, uz, note, cat, date}
+    completedLessons: {},   // lessonId -> true
+    grammarScores: {},       // topicId -> {score,total,date}
+    quizHistory: [],         // {type,score,total,date}
+    skillScores: { speaking:[], listening:[], grammar:[], vocabulary:[], reading:[], writing:[] },
+    dailyLog: {},            // 'YYYY-MM-DD' -> {words:0, xp:0, minutes:0}
+    flashcardSR: {},         // wordId -> {interval, nextReview, ease, reps}
+    dailyChallengeDate: null,
+    dailyChallengeDone: false,
+    lastConversationScenario: null,
+  };
+}
+
+let STATE = loadState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    return Object.assign(defaultState(), parsed);
+  }catch(e){
+    console.warn('State load failed, using defaults', e);
+    return defaultState();
+  }
+}
+function saveState(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
+  }catch(e){
+    console.warn('State save failed', e);
+    showToast('⚠️ Ma\'lumotni saqlashda xatolik yuz berdi');
+  }
+}
+
+/* ---------------------------- Small utils ---------------------------- */
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function todayStr(){ const d = new Date(); return d.toISOString().slice(0,10); }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function $(sel, ctx){ return (ctx||document).querySelector(sel); }
+function $all(sel, ctx){ return Array.from((ctx||document).querySelectorAll(sel)); }
+
+function showToast(msg, ms){
+  const wrap = document.getElementById('toast-wrap');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  wrap.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(),300); }, ms||2600);
+}
+
+function addXP(amount, reason){
+  STATE.xp += amount;
+  const d = todayStr();
+  if(!STATE.dailyLog[d]) STATE.dailyLog[d] = {words:0,xp:0,minutes:0};
+  STATE.dailyLog[d].xp += amount;
+  touchStreak();
+  saveState();
+  updateHeaderStats();
+  if(reason) showToast('⭐ +'+amount+' XP — '+reason);
+}
+
+function touchStreak(){
+  const d = todayStr();
+  if(STATE.lastActiveDate === d) return;
+  const y = new Date(); y.setDate(y.getDate()-1);
+  const yStr = y.toISOString().slice(0,10);
+  if(STATE.lastActiveDate === yStr){ STATE.streak += 1; }
+  else if(STATE.lastActiveDate !== d){ STATE.streak = 1; }
+  STATE.lastActiveDate = d;
+  saveState();
+}
+
+function markWordLearned(wordId){
+  if(!STATE.learnedWords[wordId]){
+    STATE.learnedWords[wordId] = true;
+    const d = todayStr();
+    if(!STATE.dailyLog[d]) STATE.dailyLog[d] = {words:0,xp:0,minutes:0};
+    STATE.dailyLog[d].words += 1;
+    addXP(5,'yangi so\'z o\'rganildi');
+  }
+  saveState();
+}
+
+function toggleFavorite(wordId){
+  if(STATE.favoriteWords[wordId]) delete STATE.favoriteWords[wordId];
+  else STATE.favoriteWords[wordId] = true;
+  saveState();
+}
+
+/* ---------------------------- Speech helpers ---------------------------- */
+function speak(text, lang){
+  try{
+    if(!('speechSynthesis' in window)){ showToast('Bu brauzerda audio (TTS) qo\'llab-quvvatlanmaydi'); return; }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang || 'en-US';
+    u.rate = 0.92;
+    window.speechSynthesis.speak(u);
+  }catch(e){ console.warn('speak failed',e); }
+}
+
+function getRecognition(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR) return null;
+  const r = new SR();
+  r.lang = 'en-US';
+  r.interimResults = false;
+  r.maxAlternatives = 3;
+  return r;
+}
+
+function levenshtein(a,b){
+  a=a.toLowerCase().trim(); b=b.toLowerCase().trim();
+  const m=a.length,n=b.length;
+  const dp = Array.from({length:m+1},()=>new Array(n+1).fill(0));
+  for(let i=0;i<=m;i++) dp[i][0]=i;
+  for(let j=0;j<=n;j++) dp[0][j]=j;
+  for(let i=1;i<=m;i++){
+    for(let j=1;j<=n;j++){
+      dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+    }
+  }
+  return dp[m][n];
+}
+function similarityPct(a,b){
+  const dist = levenshtein(a,b);
+  const maxLen = Math.max(a.length,b.length,1);
+  return Math.max(0, Math.round((1 - dist/maxLen)*100));
+}
+
+/* Rough phonetic respelling (approximate, audio button is the source of truth) */
+function respell(word){
+  let w = word.toLowerCase();
+  const rules = [
+    [/tion$/, 'shn'],[/sion$/,'zhn'],[/ough/,'af'],[/augh/,'af'],
+    [/ph/g,'f'],[/th/g,'th'],[/ch/g,'ch'],[/sh/g,'sh'],
+    [/ee/g,'iy'],[/oo/g,'uw'],[/ea/g,'iy'],[/ai/g,'ey'],[/ay/g,'ey'],
+    [/oa/g,'ow'],[/igh/g,'ay'],[/qu/g,'kw'],[/ck/g,'k'],[/x/g,'ks'],
+    [/^y/,'y'],[/y$/,'iy'],[/e$/,'']
+  ];
+  rules.forEach(([re,rep])=>{ w = w.replace(re,rep); });
+  return w;
+}
+
+/* ==========================================================================
+   DATA — ALPHABET
+   ========================================================================== */
+const ALPHABET = [
+  ['A','ey','Apple — olma'],['B','biy','Book — kitob'],['C','siy','Cat — mushuk'],
+  ['D','diy','Dog — it'],['E','iy','Egg — tuxum'],['F','ef','Fish — baliq'],
+  ['G','jiy','Girl — qiz'],['H','eych','Hat — shlyapa'],['I','ay','Ice — muz'],
+  ['J','jey','Juice — sharbat'],['K','key','Key — kalit'],['L','el','Lion — sher'],
+  ['M','em','Moon — oy'],['N','en','Nose — burun'],['O','ow','Orange — apelsin'],
+  ['P','piy','Pen — ruchka'],['Q','kyu','Queen — malika'],['R','aar','Rain — yomg\'ir'],
+  ['S','es','Sun — quyosh'],['T','tiy','Tree — daraxt'],['U','yu','Umbrella — soyabon'],
+  ['V','viy','Van — furgon'],['W','dabl-yu','Water — suv'],['X','eks','Box — quti'],
+  ['Y','way','Yellow — sariq'],['Z','ziy','Zebra — zebra']
+];
+
+/* ==========================================================================
+   DATA — VOCABULARY (22 categories, curated starter set)
+   Format kept simple/flat so it is trivial to extend with thousands more
+   entries later: just push {id,en,uz,cat} objects into VOCAB_RAW.
+   ========================================================================== */
+const CATEGORY_META = {
+  family:{label:'Family / Oila', icon:'👨‍👩‍👧'}, food:{label:'Food / Ovqat', icon:'🍎'},
+  travel:{label:'Travel / Sayohat', icon:'✈️'}, business:{label:'Business / Biznes', icon:'💼'},
+  technology:{label:'Technology / Texnologiya', icon:'💻'}, trading:{label:'Trading / Savdo', icon:'📈'},
+  health:{label:'Health / Salomatlik', icon:'🩺'}, sport:{label:'Sport', icon:'⚽'},
+  money:{label:'Money / Pul', icon:'💰'}, education:{label:'Education / Ta\'lim', icon:'🎓'},
+  airport:{label:'Airport / Aeroport', icon:'🛫'}, hotel:{label:'Hotel / Mehmonxona', icon:'🏨'},
+  restaurant:{label:'Restaurant / Restoran', icon:'🍽️'}, shopping:{label:'Shopping / Xarid', icon:'🛍️'},
+  work:{label:'Work / Ish', icon:'🧑‍💻'}, nature:{label:'Nature / Tabiat', icon:'🌿'},
+  animals:{label:'Animals / Hayvonlar', icon:'🐾'}, color:{label:'Color / Ranglar', icon:'🎨'},
+  time:{label:'Time / Vaqt', icon:'⏰'}, weather:{label:'Weather / Ob-havo', icon:'⛅'},
+  clothes:{label:'Clothes / Kiyim', icon:'👕'}, numbers:{label:'Numbers / Sonlar', icon:'🔢'}
+};
+
+const EX_TEMPLATES = {
+  family:['This is my {w}.','Bu mening {u}.'], food:['I like to eat {w}.','Men {u} yeyishni yaxshi ko\'raman.'],
+  travel:['We need a {w} for our trip.','Sayohatimiz uchun {u} kerak.'],
+  business:['The {w} is important for our company.','{U} kompaniyamiz uchun muhim.'],
+  technology:['I use my {w} every day.','Men har kuni {u}dan foydalanaman.'],
+  trading:['The {w} changed a lot today.','Bugun {u} juda o\'zgardi.'],
+  health:['You should ask a doctor about the {w}.','{U} haqida shifokordan so\'rang.'],
+  sport:['He is very good at {w}.','U {u}da juda yaxshi.'],
+  money:['I don\'t have enough {w}.','Mening {u}im yetarli emas.'],
+  education:['The {w} was very interesting.','{U} juda qiziqarli edi.'],
+  airport:['We waited near the {w}.','Biz {u} yonida kutdik.'],
+  hotel:['The {w} was very clean and nice.','{U} juda toza va yoqimli edi.'],
+  restaurant:['Can I see the {w}, please?','{U}ni ko\'rsam bo\'ladimi?'],
+  shopping:['I bought a new {w} yesterday.','Men kecha yangi {u} sotib oldim.'],
+  work:['My {w} starts early in the morning.','Mening {u}im ertalab erta boshlanadi.'],
+  nature:['Look at that beautiful {w}!','Anavi chiroyli {u}ga qarang!'],
+  animals:['The {w} is sleeping now.','{U} hozir uxlayapti.'],
+  color:['I really like the color {w}.','Menga {u} rang juda yoqadi.'],
+  time:['See you in the {w}.','{U}da ko\'rishguncha.'],
+  weather:['It is very {w} outside today.','Bugun tashqarida juda {u}.'],
+  clothes:['She is wearing a nice {w}.','U chiroyli {u} kiyib olgan.'],
+  numbers:['I have {w} apples on the table.','Mening stolimda {u} ta olmam bor.'],
+};
+
+const VOCAB_RAW = [
+ ['family',['mother','ona'],['father','ota'],['sister','opa-singil'],['brother','aka-uka'],['son',"o'g'il"],
+   ['daughter','qiz'],['grandmother','buvi'],['grandfather','bobo'],['husband','er'],['wife','xotin'],
+   ['aunt','xola'],['uncle','amaki'],['cousin','amakivachcha'],['parents','ota-ona']],
+ ['food',['bread','non'],['water','suv'],['milk','sut'],['meat',"go'sht"],['rice','guruch'],
+   ['apple','olma'],['egg','tuxum'],['cheese','pishloq'],['sugar','shakar'],['salt','tuz'],
+   ['tea','choy'],['coffee','qahva'],['soup',"sho'rva"],['vegetable','sabzavot']],
+ ['travel',['passport','pasport'],['ticket','chipta'],['luggage','yuk'],['journey','sayohat'],['map','xarita'],
+   ['tourist','turist'],['visa','viza'],['flight','parvoz'],['border','chegara'],['guide','gid'],
+   ['destination','manzil'],['itinerary','marshrut'],['backpack','ryukzak'],['souvenir','suvenir']],
+ ['business',['company','kompaniya'],['manager','menejer'],['meeting','uchrashuv'],['contract','shartnoma'],
+   ['client','mijoz'],['profit','foyda'],['investment','investitsiya'],['employee','xodim'],
+   ['strategy','strategiya'],['deadline','muddat'],['budget','byudjet'],['partner','hamkor'],
+   ['market','bozor'],['negotiation','muzokara']],
+ ['technology',['computer','kompyuter'],['internet','internet'],['software','dastur'],['phone','telefon'],
+   ['keyboard','klaviatura'],['screen','ekran'],['password','parol'],['application','ilova'],
+   ['network','tarmoq'],['database',"ma'lumotlar bazasi"],['robot','robot'],['server','server'],
+   ['code','kod'],['device','qurilma']],
+ ['trading',['stock','aksiya'],['price','narx'],['demand','talab'],['supply','taklif'],['currency','valyuta'],
+   ['exchange','almashish'],['broker','broker'],['trend','tendensiya'],['risk','xavf'],['asset','aktiv'],
+   ['trader','treyder'],['chart','grafik']],
+ ['health',['doctor','shifokor'],['hospital','kasalxona'],['medicine','dori'],['pain',"og'riq"],['fever','isitma'],
+   ['injury','jarohat'],['healthy',"sog'lom"],['illness','kasallik'],['nurse','hamshira'],
+   ['treatment','davolash'],['symptom','alomat'],['pharmacy','dorixona'],['vaccine','vaktsina']],
+ ['sport',['football','futbol'],['basketball','basketbol'],['swimming','suzish'],['run','yugurish'],
+   ['team','jamoa'],['coach','murabbiy'],['match',"o'yin"],['victory',"g'alaba"],['champion','chempion'],
+   ['stadium','stadion'],['exercise','mashq'],['referee','hakam'],['goal','gol'],['athlete','sportchi']],
+ ['money',['cash','naqd pul'],['bank','bank'],['salary','oylik'],['coin','tanga'],['wallet','hamyon'],
+   ['debt','qarz'],['savings',"jamg'arma"],['expense','xarajat'],['income','daromad'],['loan','kredit'],
+   ['rich','boy'],['poor',"kambag'al"]],
+ ['education',['school','maktab'],['teacher',"o'qituvchi"],['student','talaba'],['book','kitob'],
+   ['exam','imtihon'],['homework','uy vazifasi'],['lesson','dars'],['university','universitet'],
+   ['knowledge','bilim'],['degree','daraja'],['classroom','sinf xonasi'],['subject','fan'],
+   ['grade','baho'],['library','kutubxona']],
+ ['airport',['airplane','samolyot'],['gate','darvoza'],['baggage','yuk'],['boarding','qo\'nishga chiqish'],
+   ['security','xavfsizlik'],['arrival','kelish'],['departure',"jo'nash"],['customs','bojxona'],
+   ['terminal','terminal'],['pilot','uchuvchi'],['delay','kechikish'],['seatbelt','xavfsizlik kamari']],
+ ['hotel',['room','xona'],['reception','qabulxona'],['reservation','bron'],['key','kalit'],
+   ['lobby','foye'],['suite','lyuks xona'],['checkout','chiqish'],['staff','xodimlar'],
+   ['service','xizmat'],['elevator','lift'],['towel','sochiq'],['breakfast','nonushta'],
+   ['view','manzara'],['guest','mehmon']],
+ ['restaurant',['menu','menyu'],['waiter','ofitsiant'],['order','buyurtma'],['bill','hisob'],
+   ['dish','taom'],['table','stol'],['chef','oshpaz'],['dessert','shirinlik'],['drink','ichimlik'],
+   ['tip','choy puli'],['taste',"ta'm"],['delicious','mazali'],['portion','porsiya']],
+ ['shopping',['store',"do'kon"],['discount','chegirma'],['receipt','chek'],['cashier','kassir'],
+   ['customer','mijoz'],['bag','sumka'],['size',"o'lcham"],['sale','sotuv'],['brand','brend'],
+   ['quality','sifat'],['refund','pulni qaytarish'],['cart','savat']],
+ ['work',['job','ish'],['office','ofis'],['colleague','hamkasb'],['boss','boshliq'],['career','karyera'],
+   ['resume','rezyume'],['interview','suhbat'],['task','vazifa'],['promotion',"lavozim ko'tarilishi"],
+   ['skill',"ko'nikma"],['experience','tajriba'],['workplace','ish joyi']],
+ ['nature',['mountain',"tog'"],['river','daryo'],['forest',"o'rmon"],['ocean','okean'],['sky','osmon'],
+   ['sun','quyosh'],['moon','oy'],['star','yulduz'],['tree','daraxt'],['flower','gul'],
+   ['rain',"yomg'ir"],['wind','shamol'],['lake',"ko'l"],['desert',"cho'l"]],
+ ['animals',['dog','it'],['cat','mushuk'],['horse','ot'],['lion','sher'],['elephant','fil'],
+   ['bird','qush'],['fish','baliq'],['bear','ayiq'],['tiger',"yo'lbars"],['monkey','maymun'],
+   ['sheep',"qo'y"],['cow','sigir'],['rabbit','quyon'],['snake','ilon']],
+ ['color',['red','qizil'],['blue',"ko'k"],['green','yashil'],['yellow','sariq'],['black','qora'],
+   ['white','oq'],['orange',"to'q sariq"],['purple','binafsha'],['pink','pushti'],['brown','jigarrang'],
+   ['gray','kulrang'],['gold','oltin rang']],
+ ['time',['morning','ertalab'],['afternoon','tushdan keyin'],['evening','kechqurun'],['night','tun'],
+   ['today','bugun'],['tomorrow','ertaga'],['yesterday','kecha'],['week','hafta'],['month','oy'],
+   ['year','yil'],['hour','soat'],['minute','daqiqa'],['second','soniya']],
+ ['weather',['sunny','quyoshli'],['rainy',"yomg'irli"],['cloudy','bulutli'],['windy','shamolli'],
+   ['snow','qor'],['storm',"bo'ron"],['temperature','harorat'],['humid','nam'],['cold','sovuq'],
+   ['hot','issiq'],['foggy','tumanli']],
+ ['clothes',['shirt',"ko'ylak"],['trousers','shim'],['dress','libos'],['shoes','poyabzal'],
+   ['jacket','kurtka'],['hat','shlyapa'],['socks','paypoq'],['skirt','yubka'],['coat','palto'],
+   ['glove',"qo'lqop"],['scarf','sharf'],['belt','kamar']],
+ ['numbers',['one','bir'],['two','ikki'],['three','uch'],['four',"to'rt"],['five','besh'],
+   ['six','olti'],['seven','yetti'],['eight','sakkiz'],['nine',"to'qqiz"],['ten',"o'n"],
+   ['hundred','yuz'],['thousand','ming']]
+];
+
+const VOCAB = [];
+VOCAB_RAW.forEach(([cat, ...words])=>{
+  words.forEach(([en,uz])=>{
+    const tpl = EX_TEMPLATES[cat] || ['This is a {w}.','Bu {u}.'];
+    VOCAB.push({
+      id: cat+'_'+en.replace(/[^a-z]/gi,''),
+      en, uz, cat,
+      ipa: respell(en),
+      ex: tpl[0].replace('{w}', en),
+      exUz: tpl[1].replace('{u}', uz)
+    });
+  });
+});
+function vocabById(id){ return VOCAB.find(v=>v.id===id); }
+/* ==========================================================================
+   DATA — GRAMMAR TOPICS
+   ========================================================================== */
+const GRAMMAR = [
+  { id:'gr_tobe', level:'A0', title:"Verb 'To Be' (am/is/are)",
+    explain:"«To be» fe'li — inglizchada eng muhim fe'l. U kim ekanligingizni, qanday ekanligingizni yoki qayerda ekanligingizni bildiradi. Uch shakli bor: am, is, are.",
+    table:[['Olmosh','To be','Misol'],['I','am','I am a student.'],['He/She/It','is','She is happy.'],['You/We/They','are','They are here.']],
+    examples:[["I am from Uzbekistan.","Men O'zbekistondanman."],["He is a teacher.","U o'qituvchi."],["We are friends.","Biz do'stmiz."]],
+    quiz:[
+      {q:"She ___ a doctor.", options:["am","is","are"], correct:1},
+      {q:"They ___ students.", options:["is","am","are"], correct:2},
+      {q:"I ___ happy today.", options:["am","is","are"], correct:0},
+    ]},
+  { id:'gr_articles', level:'A1', title:"Articles: a / an / the",
+    explain:"«A» va «an» — noaniq artikllar, bir marta aytilayotgan narsa uchun ishlatiladi. «An» unli tovush bilan boshlangan so'zdan oldin keladi. «The» — aniq artikl, ma'lum narsa haqida gapirganda ishlatiladi.",
+    table:[['Holat','Artikl','Misol'],["Undosh tovush","a","a book"],["Unli tovush","an","an apple"],["Ma'lum narsa","the","the sun"]],
+    examples:[["I have a cat.","Mening mushugim bor."],["She ate an orange.","U apelsin yedi."],["The moon is bright.","Oy yorqin."]],
+    quiz:[
+      {q:"I saw ___ elephant at the zoo.", options:["a","an","the"], correct:1},
+      {q:"___ Earth is round.", options:["A","An","The"], correct:2},
+      {q:"He bought ___ car yesterday.", options:["a","an","the"], correct:0},
+    ]},
+  { id:'gr_pressimple', level:'A1', title:"Present Simple Tense",
+    explain:"Present Simple — odatiy, doimiy harakatlar yoki haqiqatlar uchun ishlatiladi. He/She/It bilan fe'lga -s/-es qo'shiladi.",
+    table:[['Olmosh','Fe\'l shakli','Misol'],['I/You/We/They','work','I work every day.'],['He/She/It','works','He works every day.']],
+    examples:[["I go to school every day.","Men har kuni maktabga boraman."],["She likes coffee.","U qahvani yaxshi ko'radi."],["They play football.","Ular futbol o'ynaydi."]],
+    quiz:[
+      {q:"He ___ (work) at a bank.", options:["work","works","working"], correct:1},
+      {q:"They ___ (live) in Tashkent.", options:["lives","live","living"], correct:1},
+      {q:"She ___ (study) English.", options:["study","studys","studies"], correct:2},
+    ]},
+  { id:'gr_prescont', level:'A2', title:"Present Continuous Tense",
+    explain:"Hozir sodir bo'layotgan harakatni bildiradi: am/is/are + fe'l-ing.",
+    table:[['Olmosh','Yordamchi','Fe\'l+ing'],['I','am','working'],['He/She/It','is','working'],['You/We/They','are','working']],
+    examples:[["I am reading a book now.","Men hozir kitob o'qiyapman."],["She is cooking dinner.","U kechki ovqat pishiryapti."],["They are watching TV.","Ular televizor ko'rishyapti."]],
+    quiz:[
+      {q:"I ___ (eat) breakfast right now.", options:["am eating","eat","eats"], correct:0},
+      {q:"She ___ (write) a letter now.", options:["writes","is writing","write"], correct:1},
+      {q:"We ___ (play) football now.", options:["are playing","plays","play"], correct:0},
+    ]},
+  { id:'gr_pastsimple', level:'A2', title:"Past Simple Tense",
+    explain:"O'tmishda tugallangan harakatlar uchun ishlatiladi. Muntazam fe'llarga -ed qo'shiladi, ko'p fe'llar noto'g'ri (irregular) shaklga ega.",
+    table:[['Turi','Misol','Tarjima'],['Regular','worked','ishladi'],['Irregular','went','bordi'],['Irregular','saw','ko\'rdi']],
+    examples:[["I worked yesterday.","Men kecha ishladim."],["She went to Paris last year.","U o'tgan yili Parijga bordi."],["They watched a movie.","Ular kino ko'rdilar."]],
+    quiz:[
+      {q:"I ___ (go) to the market yesterday.", options:["go","went","goes"], correct:1},
+      {q:"She ___ (see) him last week.", options:["saw","seen","see"], correct:0},
+      {q:"They ___ (play) chess two days ago.", options:["play","played","plays"], correct:1},
+    ]},
+  { id:'gr_future', level:'B1', title:"Future: will / going to",
+    explain:"Kelasi zamon uchun «will» (spontane qaror/bashorat) yoki «going to» (oldindan rejalashtirilgan) ishlatiladi.",
+    table:[['Shakl','Ishlatilishi','Misol'],['will','Bashorat, tezkor qaror','It will rain tomorrow.'],['going to','Reja','I am going to study tonight.']],
+    examples:[["I will call you later.","Men keyinroq sizga qo'ng'iroq qilaman."],["We are going to visit Samarkand.","Biz Samarqandga tashrif buyurmoqchimiz."]],
+    quiz:[
+      {q:"I think it ___ rain tomorrow.", options:["will","is going to","am"], correct:0},
+      {q:"She ___ (plan) to travel next month.", options:["will going","is going to","goes"], correct:1},
+    ]},
+  { id:'gr_modals', level:'B1', title:"Modal Verbs: can / must / should",
+    explain:"Modal fe'llar imkoniyat (can), majburiyat (must), tavsiya (should) bildiradi. Modal fe'ldan keyin doim fe'lning asosiy shakli keladi.",
+    table:[['Modal','Ma\'no','Misol'],['can','imkoniyat','I can swim.'],['must','majburiyat','You must wear a seatbelt.'],['should','tavsiya','You should sleep early.']],
+    examples:[["I can speak English.","Men inglizcha gaplasha olaman."],["You must finish your homework.","Siz uy vazifangizni tugatishingiz kerak."],["You should drink water.","Siz suv ichishingiz kerak."]],
+    quiz:[
+      {q:"You ___ stop at a red light.", options:["can","must","should"], correct:1},
+      {q:"I ___ play the piano well.", options:["can","must","should"], correct:0},
+    ]},
+  { id:'gr_comparatives', level:'B2', title:"Comparatives & Superlatives",
+    explain:"Taqqoslash uchun -er/-est (qisqa so'zlar) yoki more/most (uzun so'zlar) ishlatiladi.",
+    table:[['Turi','Qisqa so\'z','Uzun so\'z'],['Comparative','bigger','more beautiful'],['Superlative','biggest','most beautiful']],
+    examples:[["This house is bigger than that one.","Bu uy anavisidan kattaroq."],["She is the most beautiful girl.","U eng chiroyli qiz."]],
+    quiz:[
+      {q:"This car is ___ (fast) than mine.", options:["faster","fastest","more fast"], correct:0},
+      {q:"He is the ___ (intelligent) student.", options:["intelligentest","most intelligent","more intelligent"], correct:1},
+    ]},
+  { id:'gr_conditionals', level:'C1', title:"Conditionals (If clauses)",
+    explain:"Shart ergash gaplar turli vaziyatlarni bildiradi: 0-turi (haqiqat), 1-turi (real kelasi), 2-turi (noreal hozirgi), 3-turi (noreal o'tmish).",
+    table:[['Turi','Struktura','Misol'],['1st','If + Present, will + V','If it rains, I will stay home.'],['2nd','If + Past, would + V','If I had money, I would travel.'],['3rd','If + Past Perfect, would have + V3','If I had studied, I would have passed.']],
+    examples:[["If it rains, I will stay home.","Agar yomg'ir yog'sa, men uyda qolaman."],["If I had money, I would travel the world.","Agar pulim bo'lsa, dunyoni sayohat qilardim."]],
+    quiz:[
+      {q:"If I ___ (have) time, I would help you.", options:["have","had","will have"], correct:1},
+      {q:"If it rains, I ___ stay home.", options:["will","would","had"], correct:0},
+    ]},
+];
+
+/* ==========================================================================
+   DATA — READING TEXTS
+   ========================================================================== */
+const READINGS = [
+  { id:'rd1', level:'A1', title:'My Family', text:"Hi! My name is Anna. I have a small family. My father is a teacher and my mother is a doctor. I have one brother. He is ten years old. We live in a nice house near the park. On Sundays, we go for a walk together.",
+    questions:[
+      {q:'What is Anna\'s father\'s job?', options:['Doctor','Teacher','Driver'], correct:1},
+      {q:'How old is Anna\'s brother?', options:['Ten','Twelve','Eight'], correct:0},
+      {q:'Where do they live?', options:['Near the school','Near the park','In the city center'], correct:1},
+    ]},
+  { id:'rd2', level:'A2', title:'A Trip to the Market', text:"Yesterday, I went to the market with my mother. We bought fresh vegetables, fruit, and bread. The market was very busy. There were many people buying and selling things. We spent about two hours there and then went home to cook lunch.",
+    questions:[
+      {q:'Who did the writer go with?', options:['Father','Mother','Friend'], correct:1},
+      {q:'What did they buy?', options:['Clothes','Vegetables and fruit','Books'], correct:1},
+      {q:'How long did they stay?', options:['One hour','Two hours','All day'], correct:1},
+    ]},
+  { id:'rd3', level:'B1', title:'The Importance of Learning English', text:"English is one of the most widely spoken languages in the world. It is used in business, science, and technology. Learning English opens many doors: better job opportunities, access to information, and the ability to communicate with people from different countries. Although it can be challenging, consistent practice makes a big difference.",
+    questions:[
+      {q:'Why is English important according to the text?', options:['It is easy','It opens many doors','It is old'], correct:1},
+      {q:'What helps with learning English?', options:['Luck','Consistent practice','Watching TV only'], correct:1},
+    ]},
+  { id:'rd4', level:'B2', title:'Remote Work Trends', text:"In recent years, remote work has transformed how companies operate. Many employees now prefer flexible schedules and the ability to work from anywhere. While this offers freedom, it also presents challenges such as maintaining communication and preventing isolation. Companies are adapting by investing in digital tools and setting clearer expectations.",
+    questions:[
+      {q:'What do many employees prefer now?', options:['Fixed office hours','Flexible schedules','No communication'], correct:1},
+      {q:'What challenge does remote work present?', options:['Too much money','Preventing isolation','Too many holidays'], correct:1},
+    ]},
+  { id:'rd5', level:'C1', title:'The Ethics of Artificial Intelligence', text:"As artificial intelligence becomes increasingly integrated into daily life, questions about accountability, bias, and transparency have grown more pressing. Developers face the challenge of designing systems that are not only efficient but also fair and explainable. Policymakers, meanwhile, must balance innovation with the protection of individual rights.",
+    questions:[
+      {q:'What questions have grown more pressing?', options:['Speed and cost','Accountability, bias, transparency','Marketing strategies'], correct:1},
+      {q:'What must policymakers balance?', options:['Innovation and rights','Profit and loss','Speed and design'], correct:0},
+    ]},
+];
+
+/* ==========================================================================
+   DATA — LISTENING DIALOGUES
+   ========================================================================== */
+const LISTENINGS = [
+  { id:'ls1', level:'A1', title:'At the Cafe', lines:[
+      "A: Hello! What would you like to drink?","B: Hi! I would like a coffee, please.","A: Sure. Anything else?","B: No, thank you. That is all." ],
+    questions:[{q:'What does B order?', options:['Tea','Coffee','Juice'], correct:1}]},
+  { id:'ls2', level:'A2', title:'Asking for Directions', lines:[
+      "A: Excuse me, how do I get to the train station?","B: Go straight and turn left at the bank.","A: Is it far from here?","B: No, it is about five minutes on foot." ],
+    questions:[{q:'Where should the person turn left?', options:['At the bank','At the school','At the park'], correct:0}]},
+  { id:'ls3', level:'B1', title:'Booking a Hotel Room', lines:[
+      "A: Good morning, I would like to book a room for two nights.","B: Sure, what type of room would you like?","A: A single room with breakfast included, please.","B: Great, your total will be 150 dollars." ],
+    questions:[{q:'How many nights does the guest book?', options:['One','Two','Three'], correct:1}]},
+  { id:'ls4', level:'B2', title:'Job Interview', lines:[
+      "A: Tell me about your previous work experience.","B: I worked as a project manager for three years, leading a team of ten people.","A: What was your biggest achievement?","B: I successfully delivered a major project two weeks ahead of schedule." ],
+    questions:[{q:'What was B\'s role?', options:['Project manager','Designer','Driver'], correct:0}]},
+  { id:'ls5', level:'C1', title:'Discussing Climate Policy', lines:[
+      "A: What do you think about the new climate policy?","B: I believe it is a step in the right direction, though implementation will be challenging.","A: What challenges do you foresee?","B: Mainly funding and coordination between different levels of government." ],
+    questions:[{q:'What challenges does B mention?', options:['Funding and coordination','Weather','Transportation'], correct:0}]},
+];
+
+/* ==========================================================================
+   DATA — CONVERSATION SCENARIOS
+   ========================================================================== */
+const CONVERSATIONS = [
+  { id:'cv_airport', icon:'🛫', title:'Airport', lines:[
+      {sys:"Good morning! Can I see your passport and ticket, please?", options:["Here you are.","No, I don't have it.","I am hungry."], correct:0},
+      {sys:"Thank you. Do you have any luggage to check in?", options:["Yes, one suitcase.","I am from Uzbekistan.","See you later."], correct:0},
+      {sys:"Great, here is your boarding pass. Have a nice flight!", options:["Thank you very much!","What time is it?","I don't like flights."], correct:0},
+  ]},
+  { id:'cv_hotel', icon:'🏨', title:'Hotel', lines:[
+      {sys:"Welcome! Do you have a reservation?", options:["Yes, under the name Alimov.","I want to buy a car.","No, thanks."], correct:0},
+      {sys:"Perfect. Would you like a room with a view?", options:["Yes, please.","I am a teacher.","It is Monday."], correct:0},
+      {sys:"Here is your key. Breakfast is from 7 to 10 AM.", options:["Thank you!","How much is a taxi?","I don't like breakfast."], correct:0},
+  ]},
+  { id:'cv_restaurant', icon:'🍽️', title:'Restaurant', lines:[
+      {sys:"Good evening! Are you ready to order?", options:["Yes, I would like the grilled chicken.","I am not hungry at all today.","What time is it now?"], correct:0},
+      {sys:"Would you like anything to drink?", options:["Just water, please.","I live in Tashkent.","No idea."], correct:0},
+      {sys:"Here is your bill. Have a nice day!", options:["Thank you, keep the change.","I don't want to pay.","See you tomorrow."], correct:0},
+  ]},
+  { id:'cv_interview', icon:'🧑‍💼', title:'Job Interview', lines:[
+      {sys:"Tell me a little about yourself.", options:["I have three years of experience in marketing.","I like pizza.","It's sunny today."], correct:0},
+      {sys:"Why do you want to work here?", options:["I admire your company's mission and growth.","I need a bus ticket.","No particular reason."], correct:0},
+      {sys:"Do you have any questions for us?", options:["Yes, what does a typical day look like?","No thanks, goodbye.","I don't know."], correct:0},
+  ]},
+  { id:'cv_business', icon:'💼', title:'Business Meeting', lines:[
+      {sys:"Let's review the quarterly sales report.", options:["Sure, revenue grew by 12% this quarter.","I like coffee.","It's raining outside."], correct:0},
+      {sys:"What do you suggest for next quarter?", options:["I suggest increasing our marketing budget.","Let's go home.","I don't have any idea at all."], correct:0},
+  ]},
+  { id:'cv_shopping', icon:'🛍️', title:'Shopping', lines:[
+      {sys:"Can I help you find anything?", options:["Yes, I'm looking for a jacket.","No, I live here.","I am a student."], correct:0},
+      {sys:"What size do you need?", options:["Medium, please.","Blue.","Tomorrow."], correct:0},
+  ]},
+  { id:'cv_doctor', icon:'🩺', title:'Doctor Visit', lines:[
+      {sys:"What seems to be the problem today?", options:["I have a headache and a fever.","I like sports.","It's Friday."], correct:0},
+      {sys:"How long have you had these symptoms?", options:["Since yesterday morning.","Since 2020.","I don't remember anything."], correct:0},
+  ]},
+  { id:'cv_taxi', icon:'🚕', title:'Taxi', lines:[
+      {sys:"Where would you like to go?", options:["To the airport, please.","I like taxis.","It's cold."], correct:0},
+      {sys:"That will be around 20 dollars.", options:["Okay, here you go.","I don't have a car.","See you."], correct:0},
+  ]},
+  { id:'cv_bank', icon:'🏦', title:'Bank', lines:[
+      {sys:"How can I help you today?", options:["I would like to open a savings account.","I like the weather.","No idea at all."], correct:0},
+      {sys:"Could I see your ID, please?", options:["Sure, here it is.","I forgot my name.","I don't have any ID ever."], correct:0},
+  ]},
+  { id:'cv_friend', icon:'👋', title:'Meeting a Friend', lines:[
+      {sys:"Hey! Long time no see, how have you been?", options:["I've been great, thanks! And you?","I am a doctor.","It's Tuesday."], correct:0},
+      {sys:"Would you like to grab a coffee sometime?", options:["Sure, I'd love that!","I don't drink water.","No idea what coffee is."], correct:0},
+  ]},
+];
+/* ==========================================================================
+   NAVIGATION CONFIG & ROUTER
+   ========================================================================== */
+const NAV = [
+  { group:"Asosiy", items:[
+    {id:'dashboard', label:'Dashboard', icon:'🏠'},
+    {id:'levels', label:'Level System', icon:'🪜'},
+    {id:'daily', label:'Daily Challenge', icon:'🎯'},
+  ]},
+  { group:"O'rganish", items:[
+    {id:'alphabet', label:'Alphabet', icon:'🔤'},
+    {id:'vocabulary', label:'Vocabulary', icon:'📚'},
+    {id:'grammar', label:'Grammar', icon:'📐'},
+    {id:'dictionary', label:'Dictionary', icon:'🔎'},
+  ]},
+  { group:"Amaliyot", items:[
+    {id:'speaking', label:'Speaking', icon:'🎤'},
+    {id:'listening', label:'Listening', icon:'🎧'},
+    {id:'reading', label:'Reading', icon:'📖'},
+    {id:'writing', label:'Writing', icon:'✍️'},
+    {id:'pronunciation', label:'Pronunciation', icon:'🗣️'},
+    {id:'conversation', label:'Conversation', icon:'💬'},
+  ]},
+  { group:"Takrorlash", items:[
+    {id:'flashcards', label:'Flashcards', icon:'🃏'},
+    {id:'quiz', label:'Quiz', icon:'❓'},
+    {id:'games', label:'Mini Games', icon:'🎮'},
+    {id:'notebook', label:'Notebook', icon:'📓'},
+  ]},
+  { group:"AI & Tahlil", items:[
+    {id:'chat', label:'AI Chat Teacher', icon:'🤖'},
+    {id:'statistics', label:'Statistics', icon:'📊'},
+    {id:'analysis', label:'AI Analysis', icon:'🧠'},
+  ]},
+];
+
+let currentPage = 'dashboard';
+const PAGE_TITLES = {
+  dashboard:['Dashboard',"Bugungi taraqqiyotingiz"], levels:['Level System',"Bosqichlar bo'yicha rivojlanish"],
+  alphabet:['Alphabet',"Ingliz alifbosi va talaffuz"], vocabulary:['Vocabulary',"So'z boyligingizni oshiring"],
+  grammar:['Grammar',"Grammatik mavzular va mashqlar"], speaking:['Speaking',"Talaffuzingizni sinab ko'ring"],
+  listening:['Listening',"Diqqat bilan tinglang"], reading:['Reading',"O'qing va tushuning"],
+  writing:['Writing',"Yozish mashqlari"], chat:['AI Chat Teacher',"Sun'iy intellekt o'qituvchi bilan suhbat"],
+  daily:['Daily Challenge',"Har kungi yangi vazifa"], flashcards:['Flashcards',"Kartochkalar bilan takrorlash"],
+  quiz:['Quiz',"Bilimingizni sinab ko'ring"], pronunciation:['Pronunciation Checker',"Talaffuzni tekshirish"],
+  conversation:['Conversation Practice',"Real hayotiy muloqot mashqi"], games:['Mini Games',"O'ynab, o'rganing"],
+  dictionary:['Dictionary',"Ichki lug'at"], notebook:['Notebook',"Shaxsiy so'z daftaringiz"],
+  statistics:['Statistics',"Rivojlanish statistikasi"], analysis:['AI Analysis',"Kuchli va zaif tomonlaringiz tahlili"],
+};
+
+function renderNav(){
+  const wrap = document.getElementById('navList');
+  wrap.innerHTML = NAV.map(g => `
+    <div class="nav-group-label">${g.group}</div>
+    ${g.items.map(it => `<button class="nav-item ${currentPage===it.id?'active':''}" onclick="navigate('${it.id}')">
+        <span class="ic">${it.icon}</span><span>${it.label}</span>
+      </button>`).join('')}
+  `).join('');
+}
+
+function navigate(page){
+  currentPage = page;
+  document.getElementById('pageTitle').textContent = PAGE_TITLES[page][0];
+  document.getElementById('pageSubtitle').textContent = PAGE_TITLES[page][1];
+  renderNav();
+  closeSidebar();
+  const renderer = PAGE_RENDERERS[page];
+  const main = document.getElementById('mainContent');
+  main.innerHTML = '';
+  try{
+    if(renderer) renderer(main);
+    else main.innerHTML = `<div class="empty-state"><div class="ic">🚧</div><p>Bu bo'lim topilmadi.</p></div>`;
+  }catch(e){
+    console.error('Render error for page', page, e);
+    main.innerHTML = `<div class="empty-state"><div class="ic">⚠️</div><p>Bo'limni yuklashda xatolik yuz berdi. Sahifani qayta yuklab ko'ring.</p></div>`;
+  }
+  window.scrollTo(0,0);
+  touchStreak();
+  updateHeaderStats();
+}
+
+function openSidebar(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('scrim').classList.add('show'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('scrim').classList.remove('show'); }
+
+function toggleTheme(){
+  STATE.theme = STATE.theme==='dark' ? 'light' : 'dark';
+  applyTheme();
+  saveState();
+}
+function applyTheme(){
+  document.body.classList.toggle('dark', STATE.theme==='dark');
+  document.getElementById('themeToggle').textContent = STATE.theme==='dark' ? '☀️' : '🌙';
+}
+
+function updateHeaderStats(){
+  document.getElementById('xpPill').textContent = '⭐ '+STATE.xp+' XP';
+  document.getElementById('sideStreak').textContent = STATE.streak;
+  const badge = document.getElementById('onlineBadge');
+  badge.classList.toggle('hidden', !navigator.onLine);
+}
+
+/* ==========================================================================
+   PAGE RENDERERS — registered in one object, filled in progressively below
+   ========================================================================== */
+const PAGE_RENDERERS = {};
+
+/* ---------------------------- DASHBOARD ---------------------------- */
+PAGE_RENDERERS.dashboard = function(main){
+  const levels = STATE.levels;
+  const curIdx = STATE.unlockedIndex;
+  const learnedCount = Object.keys(STATE.learnedWords).length;
+  const lessonsCount = Object.keys(STATE.completedLessons).length;
+  const d = todayStr();
+  const todayLog = STATE.dailyLog[d] || {words:0,xp:0,minutes:0};
+  const goalPct = Math.min(100, Math.round((todayLog.words / STATE.dailyGoalWords)*100));
+
+  const trailHtml = levels.map((lv,i)=>{
+    const cls = i < curIdx ? 'done' : (i===curIdx ? 'current':'locked');
+    return `<div class="trail-node ${cls}"><div class="trail-line"></div><div class="trail-dot">${i<curIdx?'✓':lv}</div><span>${lv}</span></div>`;
+  }).join('');
+
+  main.innerHTML = `
+    <div class="hero-path">
+      <div class="hero-top">
+        <div>
+          <h3>Xush kelibsiz! 👋</h3>
+          <p>Joriy daraja: <b>${STATE.currentLevel}</b>. Har kuni kamida ${STATE.dailyGoalWords} so'z o'rganib, C1 darajasiga qadam-baqadam yaqinlashing.</p>
+        </div>
+        <div class="hero-stat">
+          <b>${STATE.streak} 🔥</b>
+          <span>kunlik streak</span>
+        </div>
+      </div>
+      <div class="level-trail">${trailHtml}</div>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:22px">
+      <div class="card stat-card">
+        <div class="top"><div class="ic-badge" style="background:var(--primary-soft);color:var(--primary)">📅</div></div>
+        <b>${todayLog.words}/${STATE.dailyGoalWords}</b><span class="lbl">Bugungi maqsad (so'z)</span>
+        <div class="progress-bar"><i style="width:${goalPct}%"></i></div>
+      </div>
+      <div class="card stat-card">
+        <div class="top"><div class="ic-badge" style="background:var(--success-soft);color:var(--success)">📚</div></div>
+        <b>${learnedCount}</b><span class="lbl">O'rganilgan so'zlar</span>
+      </div>
+      <div class="card stat-card">
+        <div class="top"><div class="ic-badge" style="background:var(--accent-soft);color:#B05E00">✅</div></div>
+        <b>${lessonsCount}</b><span class="lbl">Tugatilgan darslar</span>
+      </div>
+      <div class="card stat-card">
+        <div class="top"><div class="ic-badge" style="background:var(--danger-soft);color:var(--danger)">⭐</div></div>
+        <b>${STATE.xp}</b><span class="lbl">Jami XP</span>
+      </div>
+    </div>
+
+    <div class="section-title">📈 Haftalik statistika</div>
+    <div class="card chart-card"><canvas id="weeklyChart"></canvas></div>
+
+    <div class="section-title">🗓️ Oylik statistika</div>
+    <div class="card chart-card"><canvas id="monthlyChart"></canvas></div>
+
+    <div class="section-title">💪 Motivatsiya</div>
+    <div class="card" style="text-align:center;padding:30px">
+      <p style="font-family:var(--font-display);font-size:19px;font-weight:600">"${motivationalQuote()}"</p>
+      <button class="btn btn-primary" style="margin-top:16px" onclick="navigate('daily')">Bugungi vazifani bajarish →</button>
+    </div>
+  `;
+  drawBarChart('weeklyChart', last7DaysData());
+  drawBarChart('monthlyChart', last30DaysData());
+};
+
+function motivationalQuote(){
+  const quotes = [
+    "Har bir yangi so'z — kelajakdagi imkoniyat.",
+    "Kichik qadamlar katta natijalarga olib keladi.",
+    "Bugun o'rganganing ertaga foyda beradi.",
+    "Xato qilishdan qo'rqma — bu o'rganishning bir qismi.",
+    "Muvaffaqiyat — kunlik intizomning natijasi."
+  ];
+  const idx = new Date().getDate() % quotes.length;
+  return quotes[idx];
+}
+
+function last7DaysData(){
+  const out = [];
+  for(let i=6;i>=0;i--){
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const key = d.toISOString().slice(0,10);
+    const log = STATE.dailyLog[key] || {words:0};
+    out.push({label: d.toLocaleDateString('uz-UZ',{weekday:'short'}), value: log.words});
+  }
+  return out;
+}
+function last30DaysData(){
+  const out = [];
+  for(let i=29;i>=0;i-=3){
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const key = d.toISOString().slice(0,10);
+    const log = STATE.dailyLog[key] || {words:0};
+    out.push({label: (d.getMonth()+1)+'/'+d.getDate(), value: log.words});
+  }
+  return out;
+}
+
+/* Minimal canvas bar chart (no external library => fully offline) */
+function drawBarChart(canvasId, data){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth || 600, h = 180;
+  canvas.width = w*dpr; canvas.height = h*dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,w,h);
+  const isDark = STATE.theme==='dark';
+  const max = Math.max(1, ...data.map(d=>d.value));
+  const padL=30, padB=24, barGap=8;
+  const chartW = w - padL - 10;
+  const barW = chartW/data.length - barGap;
+  ctx.strokeStyle = isDark ? '#2B2F52' : '#E1E4F0';
+  ctx.beginPath();
+  for(let i=0;i<=4;i++){
+    const y = 10 + (h-padB-10)*(i/4);
+    ctx.moveTo(padL,y); ctx.lineTo(w,y);
+  }
+  ctx.stroke();
+  data.forEach((d,i)=>{
+    const x = padL + i*(barW+barGap);
+    const barH = (d.value/max) * (h-padB-14);
+    const y = h-padB-barH;
+    const grad = ctx.createLinearGradient(0,y,0,h-padB);
+    grad.addColorStop(0,'#FF9F1C'); grad.addColorStop(1,'#FF6B35');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x,y,barW,barH,4) : ctx.rect(x,y,barW,barH);
+    ctx.fill();
+    ctx.fillStyle = isDark ? '#9498BD' : '#6A6F8C';
+    ctx.font = '10px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(d.label, x+barW/2, h-8);
+  });
+}
+/* ---------------------------- LEVEL SYSTEM ---------------------------- */
+PAGE_RENDERERS.levels = function(main){
+  const levels = STATE.levels;
+  const descs = {
+    A0:"Boshlang'ich — alifbo va eng oddiy so'zlar",
+    A1:"Asosiy so'zlar va oddiy gaplar",
+    A2:"Kundalik muloqot va grammatika asoslari",
+    B1:"Mustaqil fikr bildirish, murakkabroq matnlar",
+    B2:"Erkin muloqot, ish va o'qish uchun til",
+    C1:"Yuqori daraja — professional va akademik til"
+  };
+  main.innerHTML = `
+    <div class="card" style="margin-bottom:20px">
+      <p style="color:var(--muted);font-size:14px">Har bir bosqichni ochish uchun oldingi bosqich testidan kamida 70% ball bilan o'ting. Joriy ochiq daraja: <b style="color:var(--primary)">${STATE.currentLevel}</b></p>
+    </div>
+    <div class="grid grid-3" id="levelGrid"></div>
+  `;
+  const grid = document.getElementById('levelGrid');
+  grid.innerHTML = levels.map((lv,i)=>{
+    const locked = i > STATE.unlockedIndex;
+    const done = i < STATE.unlockedIndex;
+    return `
+      <div class="card level-card card-hover ${locked?'locked':''}">
+        ${locked?'<div class="lock-ic">🔒</div>':(done?'<div class="lock-ic">✅</div>':'')}
+        <div class="badge-num">${lv}</div>
+        <p style="font-size:13px;color:var(--muted);margin:10px 0 14px">${descs[lv]}</p>
+        ${locked
+          ? `<button class="btn btn-ghost btn-sm" disabled>Qulflangan</button>`
+          : `<button class="btn ${done?'btn-outline':'btn-primary'} btn-sm" onclick="startLevelTest('${lv}', ${i})">${done?"Testni qayta topshirish":"Bosqich testi"}</button>`
+        }
+      </div>`;
+  }).join('');
+};
+
+function startLevelTest(level, idx){
+  // Build a quick 8-question test mixing vocab + grammar for that level
+  const gramForLevel = GRAMMAR.filter(g=>g.level===level);
+  let qs = [];
+  gramForLevel.forEach(g=> g.quiz.forEach(q=> qs.push({q:q.q, options:q.options, correct:q.correct, topic:g.title})));
+  // pad with vocab translation questions
+  const catWords = shuffleArr(VOCAB.slice()).slice(0,6);
+  catWords.forEach(w=>{
+    const wrongs = shuffleArr(VOCAB.filter(v=>v.id!==w.id)).slice(0,2).map(v=>v.uz);
+    const options = shuffleArr([w.uz, ...wrongs]);
+    qs.push({q:`"${w.en}" so'zining tarjimasi qaysi?`, options, correct: options.indexOf(w.uz), topic:'Vocabulary'});
+  });
+  qs = shuffleArr(qs).slice(0,8);
+  if(qs.length===0){ showToast('Bu daraja uchun test mavjud emas, avtomatik ochildi.'); unlockNextLevel(idx); return; }
+  runGenericQuiz(qs, 'Level Test — '+level, (score,total)=>{
+    const pct = Math.round((score/total)*100);
+    STATE.grammarScores['level_'+level] = {score,total,date:todayStr()};
+    saveState();
+    if(pct>=70){
+      showToast('🎉 Test muvaffaqiyatli! '+pct+'%');
+      unlockNextLevel(idx);
+    } else {
+      showToast('Ball: '+pct+'%. Kamida 70% kerak, qayta urinib ko\'ring.');
+    }
+  });
+}
+function unlockNextLevel(idx){
+  if(idx >= STATE.unlockedIndex){
+    STATE.unlockedIndex = Math.min(idx+1, STATE.levels.length-1);
+    STATE.currentLevel = STATE.levels[STATE.unlockedIndex];
+    addXP(50, level+' bosqichi ochildi');
+  }
+  saveState();
+  navigate('levels');
+}
+function shuffleArr(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+/* ---------------------------- ALPHABET ---------------------------- */
+PAGE_RENDERERS.alphabet = function(main){
+  main.innerHTML = `
+    <div class="card" style="margin-bottom:18px">
+      <p style="color:var(--muted);font-size:14px">Har bir harfga bosing — talaffuzini eshitasiz. Bu 0-darajadagilar uchun birinchi qadam.</p>
+    </div>
+    <div class="grid grid-4" id="alphaGrid"></div>
+  `;
+  const grid = document.getElementById('alphaGrid');
+  grid.innerHTML = ALPHABET.map(([letter,pron,ex])=>`
+    <div class="card letter-card card-hover" onclick="speak('${letter}')">
+      <div class="big">${letter}${letter.toLowerCase()}</div>
+      <div class="ipa">/${pron}/</div>
+      <div class="ex">${ex}</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="event.stopPropagation();speak('${letter.toLowerCase()}')">🔊 Eshitish</button>
+    </div>
+  `).join('');
+};
+
+/* ---------------------------- VOCABULARY ---------------------------- */
+let vocabFilterCat = 'all';
+let vocabFilterMode = 'all'; // all | learned | favorite
+let vocabSearch = '';
+
+PAGE_RENDERERS.vocabulary = function(main){
+  const cats = Object.keys(CATEGORY_META);
+  main.innerHTML = `
+    <input class="search-input" id="vocabSearchInput" placeholder="So'z qidirish... (masalan: apple, ona, hotel)" style="margin-bottom:14px" oninput="vocabSearch=this.value; renderVocabList();">
+    <div class="filter-row" id="vocabModeFilter">
+      <button class="chip-filter ${vocabFilterMode==='all'?'active':''}" onclick="vocabFilterMode='all';navigate('vocabulary')">Barchasi (${VOCAB.length})</button>
+      <button class="chip-filter ${vocabFilterMode==='learned'?'active':''}" onclick="vocabFilterMode='learned';navigate('vocabulary')">✅ O'rganilgan</button>
+      <button class="chip-filter ${vocabFilterMode==='favorite'?'active':''}" onclick="vocabFilterMode='favorite';navigate('vocabulary')">⭐ Sevimli</button>
+    </div>
+    <div class="filter-row" id="vocabCatFilter">
+      <button class="chip-filter ${vocabFilterCat==='all'?'active':''}" onclick="vocabFilterCat='all';navigate('vocabulary')">🗂️ Barcha kategoriya</button>
+      ${cats.map(c=>`<button class="chip-filter ${vocabFilterCat===c?'active':''}" onclick="vocabFilterCat='${c}';navigate('vocabulary')">${CATEGORY_META[c].icon} ${CATEGORY_META[c].label.split(' / ')[0]}</button>`).join('')}
+    </div>
+    <div class="grid grid-3" id="vocabGrid"></div>
+  `;
+  renderVocabList();
+};
+
+function renderVocabList(){
+  const grid = document.getElementById('vocabGrid');
+  if(!grid) return;
+  let list = VOCAB.slice();
+  if(vocabFilterCat!=='all') list = list.filter(w=>w.cat===vocabFilterCat);
+  if(vocabFilterMode==='learned') list = list.filter(w=>STATE.learnedWords[w.id]);
+  if(vocabFilterMode==='favorite') list = list.filter(w=>STATE.favoriteWords[w.id]);
+  if(vocabSearch.trim()){
+    const s = vocabSearch.trim().toLowerCase();
+    list = list.filter(w=>w.en.toLowerCase().includes(s) || w.uz.toLowerCase().includes(s));
+  }
+  if(list.length===0){
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="ic">🔍</div><p>Hech narsa topilmadi.</p></div>`;
+    return;
+  }
+  grid.innerHTML = list.map(w=>wordCardHtml(w)).join('');
+}
+
+function wordCardHtml(w){
+  const learned = !!STATE.learnedWords[w.id];
+  const fav = !!STATE.favoriteWords[w.id];
+  return `
+    <div class="card word-card card-hover">
+      <div class="wtop">
+        <div>
+          <div class="en">${w.en}</div>
+          <div class="ipa">/${w.ipa}/</div>
+        </div>
+        <span class="pill pill-primary">${CATEGORY_META[w.cat].icon}</span>
+      </div>
+      <div class="uz">${w.uz}</div>
+      <div class="ex">${w.ex}<br>${w.exUz}</div>
+      <div class="word-actions">
+        <button class="btn btn-ghost btn-sm" onclick="speak('${w.en.replace(/'/g,"\\'")}')">🔊</button>
+        <button class="btn ${learned?'btn-primary':'btn-outline'} btn-sm" onclick="markWordLearned('${w.id}');renderVocabList();">✓ ${learned?"O'rganilgan":"O'rganildi deb belgila"}</button>
+        <button class="btn btn-icon-only ${fav?'btn-accent':'btn-ghost'}" onclick="toggleFavorite('${w.id}');renderVocabList();">${fav?'★':'☆'}</button>
+        <button class="btn btn-ghost btn-sm" onclick="addToNotebook('${w.id}')">📓</button>
+      </div>
+    </div>`;
+}
+
+function addToNotebook(wordId){
+  const w = vocabById(wordId);
+  if(!w) return;
+  if(STATE.notebook.find(n=>n.wordId===wordId)){ showToast('Bu so\'z allaqachon daftarda'); return; }
+  STATE.notebook.push({id:uid(), wordId, en:w.en, uz:w.uz, cat:w.cat, note:'', date:todayStr()});
+  saveState();
+  showToast('📓 Daftarga qo\'shildi: '+w.en);
+}
+/* ---------------------------- GRAMMAR ---------------------------- */
+PAGE_RENDERERS.grammar = function(main){
+  main.innerHTML = `<div class="grid grid-2" id="gramGrid"></div>`;
+  const grid = document.getElementById('gramGrid');
+  grid.innerHTML = GRAMMAR.map(g=>{
+    const done = STATE.completedLessons['gram_'+g.id];
+    return `
+    <div class="card gtopic-card card-hover" onclick="openGrammarTopic('${g.id}')">
+      <div class="top-row">
+        <span class="pill pill-primary">${g.level}</span>
+        ${done?'<span class="pill pill-success">✓ Tugatilgan</span>':''}
+      </div>
+      <h3 style="font-family:var(--font-display);font-size:17px;margin-top:10px">${g.title}</h3>
+      <p style="font-size:13px;color:var(--muted);margin-top:6px">${g.explain.slice(0,90)}...</p>
+    </div>`;
+  }).join('');
+};
+
+function openGrammarTopic(id){
+  const g = GRAMMAR.find(x=>x.id===id);
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <button class="btn btn-ghost btn-sm" onclick="navigate('grammar')">← Orqaga</button>
+    <div class="card" style="margin-top:14px">
+      <span class="pill pill-primary">${g.level}</span>
+      <h2 style="font-family:var(--font-display);font-size:24px;margin:10px 0">${g.title}</h2>
+      <p style="color:var(--muted);line-height:1.6">${g.explain}</p>
+      <table class="gtable">
+        <tr>${g.table[0].map(h=>`<th>${h}</th>`).join('')}</tr>
+        ${g.table.slice(1).map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}
+      </table>
+      <div class="section-title" style="font-size:15px">Misollar</div>
+      ${g.examples.map(([en,uz])=>`<div class="ex-line"><b>${en}</b><br><span style="color:var(--muted)">${uz}</span> <button class="btn btn-ghost btn-sm" onclick="speak('${en.replace(/'/g,"\\'")}')">🔊</button></div>`).join('')}
+      <div class="exercise-block">
+        <b>Mashq:</b> quyidagi test orqali bilimingizni sinab ko'ring.
+        <div style="margin-top:12px">
+          <button class="btn btn-primary" onclick="startGrammarQuiz('${g.id}')">Testni boshlash (${g.quiz.length} savol)</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function startGrammarQuiz(id){
+  const g = GRAMMAR.find(x=>x.id===id);
+  const qs = g.quiz.map(q=>({q:q.q, options:q.options, correct:q.correct}));
+  runGenericQuiz(qs, g.title+' — Test', (score,total)=>{
+    const pct = Math.round(score/total*100);
+    STATE.grammarScores[id] = {score,total,date:todayStr()};
+    logSkillScore('grammar', pct);
+    if(pct>=60){
+      STATE.completedLessons['gram_'+id] = true;
+      addXP(15, g.title+' testi tugatildi');
+      showToast('🎉 Tabriklaymiz! Ball: '+pct+'%');
+    } else {
+      showToast('Ball: '+pct+'%. Qayta urinib ko\'ring!');
+    }
+    saveState();
+  });
+}
+
+function logSkillScore(skill, pct){
+  if(!STATE.skillScores[skill]) STATE.skillScores[skill]=[];
+  STATE.skillScores[skill].push({pct, date:todayStr()});
+  if(STATE.skillScores[skill].length>50) STATE.skillScores[skill].shift();
+  saveState();
+}
+
+/* ---------------------------- GENERIC QUIZ RUNNER (used everywhere) ---------------------------- */
+function runGenericQuiz(questions, title, onFinish){
+  let idx = 0, score = 0, selected = null;
+  const main = document.getElementById('mainContent');
+  function render(){
+    if(idx >= questions.length){
+      main.innerHTML = `
+        <div class="card" style="text-align:center;padding:40px">
+          <div style="font-size:44px">${score/questions.length>=0.7?'🎉':'📘'}</div>
+          <h2 style="font-family:var(--font-display);margin:10px 0">${title} — Natija</h2>
+          <p style="font-size:32px;font-weight:800;font-family:var(--font-mono);color:var(--primary)">${score}/${questions.length}</p>
+          <button class="btn btn-primary" style="margin-top:16px" onclick="(${onFinish?onFinish.toString():'function(){}'})(${score},${questions.length}); navigate(currentPage);">Davom etish</button>
+        </div>`;
+      return;
+    }
+    const q = questions[idx];
+    main.innerHTML = `
+      <div class="card">
+        <div class="quiz-progress"><i style="display:block;height:100%;width:${(idx/questions.length)*100}%;background:var(--primary)"></i></div>
+        <p style="font-size:12px;color:var(--muted);font-weight:700">SAVOL ${idx+1} / ${questions.length}</p>
+        <h3 style="font-family:var(--font-display);font-size:19px;margin:10px 0 18px">${q.q}</h3>
+        <div id="quizOpts">${q.options.map((o,i)=>`<button class="quiz-opt" data-i="${i}" onclick="selectQuizOpt(${i})">${o}</button>`).join('')}</div>
+        <button class="btn btn-primary" id="quizNextBtn" style="margin-top:12px" disabled onclick="quizNext()">Keyingisi →</button>
+      </div>`;
+  }
+  window.selectQuizOpt = function(i){
+    if(selected!==null) return;
+    selected = i;
+    const opts = $all('#quizOpts .quiz-opt');
+    opts.forEach((el,j)=>{
+      el.classList.toggle('selected', j===i);
+      if(j===questions[idx].correct) el.classList.add('correct');
+      else if(j===i) el.classList.add('wrong');
+    });
+    if(i===questions[idx].correct) score++;
+    document.getElementById('quizNextBtn').disabled = false;
+  };
+  window.quizNext = function(){ idx++; selected=null; render(); };
+  render();
+}
+
+/* ---------------------------- SPEAKING ---------------------------- */
+PAGE_RENDERERS.speaking = function(main){
+  const phrases = shuffleArr(VOCAB).slice(0,20).map(w=>w.en).concat(GRAMMAR.map(g=>g.examples[0][0]));
+  window._speakingPhrases = shuffleArr(phrases);
+  window._speakingIdx = 0;
+  renderSpeakingScreen(main);
+};
+function renderSpeakingScreen(main){
+  const phrase = window._speakingPhrases[window._speakingIdx % window._speakingPhrases.length];
+  main.innerHTML = `
+    <div class="card" style="text-align:center;padding:32px">
+      <p style="color:var(--muted);font-size:13px;font-weight:700">USHBU IBORANI AYTING</p>
+      <h2 style="font-family:var(--font-display);font-size:30px;margin:14px 0">"${phrase}"</h2>
+      <button class="btn btn-ghost btn-sm" onclick="speak('${phrase.replace(/'/g,"\\'")}')">🔊 Namunani eshitish</button>
+      <div class="mic-btn" id="micBtn" onclick="startSpeakingCheck('${phrase.replace(/'/g,"\\'")}')">🎤</div>
+      <p style="color:var(--muted);font-size:13px">Mikrofon tugmasini bosing va gapiring</p>
+      <div id="speakResult"></div>
+      <button class="btn btn-outline" style="margin-top:18px" onclick="window._speakingIdx++;renderSpeakingScreen(document.getElementById('mainContent'))">Keyingi ibora →</button>
+    </div>
+  `;
+}
+function startSpeakingCheck(target){
+  const rec = getRecognition();
+  const micBtn = document.getElementById('micBtn');
+  const resultBox = document.getElementById('speakResult');
+  if(!rec){
+    resultBox.innerHTML = `<div class="result-box" style="background:var(--danger-soft)">Bu brauzerda ovozni tanish (Speech Recognition) qo'llab-quvvatlanmaydi. Iltimos Google Chrome'dan foydalaning yoki matn kiriting: <br><input class="search-input" style="margin-top:8px" id="manualSpeak" placeholder="Aytganingizni yozing..."><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="evalSpeaking('${target.replace(/'/g,"\\'")}', document.getElementById('manualSpeak').value)">Tekshirish</button></div>`;
+    return;
+  }
+  micBtn.classList.add('listening');
+  resultBox.innerHTML = `<p style="color:var(--muted);margin-top:14px">Tinglanmoqda...</p>`;
+  try{
+    rec.start();
+    rec.onresult = (e)=>{
+      const said = e.results[0][0].transcript;
+      micBtn.classList.remove('listening');
+      evalSpeaking(target, said);
+    };
+    rec.onerror = (e)=>{
+      micBtn.classList.remove('listening');
+      resultBox.innerHTML = `<p style="color:var(--danger);margin-top:14px">Xatolik: ${e.error}. Mikrofonga ruxsat berilganini tekshiring.</p>`;
+    };
+    rec.onend = ()=> micBtn.classList.remove('listening');
+  }catch(err){
+    micBtn.classList.remove('listening');
+    console.warn(err);
+  }
+}
+function evalSpeaking(target, said){
+  const pct = similarityPct(target, said);
+  const resultBox = document.getElementById('speakResult');
+  const color = pct>=80?'var(--success)':(pct>=50?'var(--accent)':'var(--danger)');
+  logSkillScore('speaking', pct);
+  resultBox.innerHTML = `
+    <div class="result-box" style="background:var(--surface-2)">
+      <div class="score-ring" style="border:6px solid ${color};color:${color}">${pct}%</div>
+      <p style="margin-top:10px"><b>Siz aytdingiz:</b> "${escapeHtml(said)}"</p>
+      <p><b>Kerakli ibora:</b> "${escapeHtml(target)}"</p>
+      ${pct<80?`<p style="color:var(--danger);margin-top:6px">Talaffuzni yaxshilash uchun qayta urinib ko'ring. Har bir so'zni sekin va aniq talaffuz qiling.</p>`:`<p style="color:var(--success);margin-top:6px">Ajoyib talaffuz! 🎉</p>`}
+    </div>`;
+  if(pct>=70) addXP(8,'Speaking mashqi');
+}
+
+/* ---------------------------- LISTENING ---------------------------- */
+PAGE_RENDERERS.listening = function(main){
+  main.innerHTML = `<div class="grid grid-2" id="listenGrid"></div>`;
+  document.getElementById('listenGrid').innerHTML = LISTENINGS.map(l=>{
+    const done = STATE.completedLessons['listen_'+l.id];
+    return `<div class="card card-hover" onclick="openListening('${l.id}')">
+      <span class="pill pill-primary">${l.level}</span> ${done?'<span class="pill pill-success">✓</span>':''}
+      <h3 style="font-family:var(--font-display);font-size:17px;margin-top:10px">🎧 ${l.title}</h3>
+      <p style="font-size:13px;color:var(--muted);margin-top:6px">${l.lines.length} qatorli dialog</p>
+    </div>`;
+  }).join('');
+};
+function openListening(id){
+  const l = LISTENINGS.find(x=>x.id===id);
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <button class="btn btn-ghost btn-sm" onclick="navigate('listening')">← Orqaga</button>
+    <div class="card" style="margin-top:14px">
+      <span class="pill pill-primary">${l.level}</span>
+      <h2 style="font-family:var(--font-display);margin:10px 0">🎧 ${l.title}</h2>
+      <button class="btn btn-accent" onclick="playDialogue(${JSON.stringify(l.lines).replace(/"/g,'&quot;')})">▶️ Dialogni eshitish</button>
+      <div style="margin-top:16px" id="dialogueLines">
+        ${l.lines.map(ln=>`<p style="margin:8px 0;font-size:14px">${escapeHtml(ln)}</p>`).join('')}
+      </div>
+      <div class="exercise-block">
+        <b>Savollar:</b>
+        <button class="btn btn-primary" style="margin-top:10px" onclick="startListeningQuiz('${id}')">Savollarga javob berish</button>
+      </div>
+    </div>`;
+}
+function playDialogue(lines){
+  let i=0;
+  function next(){
+    if(i>=lines.length) return;
+    const text = lines[i].replace(/^[A-Z]:\s*/,'');
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang='en-US'; u.rate=0.92;
+    u.onend = ()=>{ i++; next(); };
+    window.speechSynthesis.speak(u);
+  }
+  if(!('speechSynthesis' in window)){ showToast('Audio bu brauzerda ishlamaydi'); return; }
+  window.speechSynthesis.cancel();
+  next();
+}
+function startListeningQuiz(id){
+  const l = LISTENINGS.find(x=>x.id===id);
+  const qs = l.questions.map(q=>({q:q.q,options:q.options,correct:q.correct}));
+  runGenericQuiz(qs, l.title, (score,total)=>{
+    const pct = Math.round(score/total*100);
+    logSkillScore('listening', pct);
+    if(pct>=60){ STATE.completedLessons['listen_'+id]=true; addXP(12,'Listening tugatildi'); }
+    saveState();
+    showToast('Natija: '+pct+'%');
+  });
+}
+
+/* ---------------------------- READING ---------------------------- */
+PAGE_RENDERERS.reading = function(main){
+  main.innerHTML = `<div class="grid grid-2" id="readGrid"></div>`;
+  document.getElementById('readGrid').innerHTML = READINGS.map(r=>{
+    const done = STATE.completedLessons['read_'+r.id];
+    return `<div class="card card-hover" onclick="openReading('${r.id}')">
+      <span class="pill pill-primary">${r.level}</span> ${done?'<span class="pill pill-success">✓</span>':''}
+      <h3 style="font-family:var(--font-display);font-size:17px;margin-top:10px">📖 ${r.title}</h3>
+      <p style="font-size:13px;color:var(--muted);margin-top:6px">${r.text.slice(0,70)}...</p>
+    </div>`;
+  }).join('');
+};
+function openReading(id){
+  const r = READINGS.find(x=>x.id===id);
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <button class="btn btn-ghost btn-sm" onclick="navigate('reading')">← Orqaga</button>
+    <div class="card" style="margin-top:14px">
+      <span class="pill pill-primary">${r.level}</span>
+      <h2 style="font-family:var(--font-display);margin:10px 0">${r.title}</h2>
+      <p style="line-height:1.8;font-size:15px">${r.text} <button class="btn btn-ghost btn-sm" onclick="speak(\`${r.text.replace(/`/g,"'")}\`)">🔊</button></p>
+      <div class="exercise-block">
+        <b>Tushunish savollari:</b>
+        <button class="btn btn-primary" style="margin-top:10px" onclick="startReadingQuiz('${id}')">Savollarga javob berish</button>
+      </div>
+    </div>`;
+}
+function startReadingQuiz(id){
+  const r = READINGS.find(x=>x.id===id);
+  const qs = r.questions.map(q=>({q:q.q,options:q.options,correct:q.correct}));
+  runGenericQuiz(qs, r.title, (score,total)=>{
+    const pct = Math.round(score/total*100);
+    logSkillScore('reading', pct);
+    if(pct>=60){ STATE.completedLessons['read_'+id]=true; addXP(12,'Reading tugatildi'); }
+    saveState();
+    showToast('Natija: '+pct+'%');
+  });
+}
+
+/* ---------------------------- WRITING ---------------------------- */
+const WRITING_TASKS = [
+  {id:'wr1', level:'A1', prompt:"Yozing: 'My Family' mavzusida 3-4 gap yozing.", keywords:['family','mother','father']},
+  {id:'wr2', level:'A2', prompt:"Yozing: Kechagi kuningiz haqida (Past Simple ishlatib) 3-4 gap yozing.", keywords:['yesterday','went','was']},
+  {id:'wr3', level:'B1', prompt:"Yozing: Sizning orzuingizdagi kasbingiz haqida 4-5 gap yozing.", keywords:['job','want','because']},
+  {id:'wr4', level:'B2', prompt:"Yozing: Zamonaviy texnologiyaning foyda va zararlari haqida fikringizni yozing.", keywords:['technology','however','because']},
+  {id:'wr5', level:'C1', prompt:"Yozing: Iqlim o'zgarishi bo'yicha o'z fikringizni asoslab yozing.", keywords:['climate','believe','therefore']},
+];
+const SENTENCE_BUILD_TASKS = [
+  {words:['I','like','to','eat','apples'], answer:'I like to eat apples'},
+  {words:['She','is','a','good','teacher'], answer:'She is a good teacher'},
+  {words:['We','are','going','to','the','airport'], answer:'We are going to the airport'},
+  {words:['He','worked','hard','yesterday'], answer:'He worked hard yesterday'},
+  {words:['They','will','travel','next','year'], answer:'They will travel next year'},
+];
+
+PAGE_RENDERERS.writing = function(main){
+  main.innerHTML = `
+    <div class="section-title">✍️ Matn yozish mashqlari</div>
+    <div class="grid grid-2" id="writeGrid"></div>
+    <div class="section-title">🧩 So'zlardan gap tuzish</div>
+    <div class="card" id="sentenceBuilderCard"></div>
+  `;
+  document.getElementById('writeGrid').innerHTML = WRITING_TASKS.map(t=>`
+    <div class="card">
+      <span class="pill pill-primary">${t.level}</span>
+      <p style="margin:10px 0;font-size:14px">${t.prompt}</p>
+      <textarea id="wtxt_${t.id}" rows="4" class="search-input" placeholder="Bu yerga yozing..."></textarea>
+      <button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="checkWriting('${t.id}')">Tekshirish</button>
+      <div id="wres_${t.id}" style="margin-top:8px"></div>
+    </div>
+  `).join('');
+  renderSentenceBuilder();
+};
+
+function checkWriting(id){
+  const t = WRITING_TASKS.find(x=>x.id===id);
+  const text = document.getElementById('wtxt_'+id).value.trim();
+  const resDiv = document.getElementById('wres_'+id);
+  if(text.length < 10){
+    resDiv.innerHTML = `<p style="color:var(--danger);font-size:13px">Iltimos, kamida bir necha gap yozing.</p>`;
+    return;
+  }
+  // Lightweight heuristic check: keyword coverage + basic spelling patterns + sentence count
+  const lower = text.toLowerCase();
+  const foundKw = t.keywords.filter(k=>lower.includes(k));
+  const sentences = text.split(/[.!?]+/).filter(s=>s.trim().length>0);
+  const words = text.split(/\s+/).filter(Boolean);
+  const capIssues = sentences.filter(s=>{ const tr=s.trim(); return tr && tr[0] !== tr[0].toUpperCase(); }).length;
+  let score = 40;
+  score += Math.min(30, foundKw.length*10);
+  score += Math.min(20, sentences.length*5);
+  score -= capIssues*8;
+  score = Math.max(10, Math.min(100, score));
+  logSkillScore('writing', score);
+  STATE.completedLessons['write_'+id] = true;
+  addXP(10, 'Writing mashqi');
+  saveState();
+  resDiv.innerHTML = `
+    <div class="result-box" style="background:var(--surface-2)">
+      <p><b>Taxminiy ball: ${score}%</b></p>
+      <p style="font-size:13px;color:var(--muted)">So'zlar soni: ${words.length} · Gaplar soni: ${sentences.length}</p>
+      ${capIssues>0?`<p style="font-size:13px;color:var(--danger)">⚠️ ${capIssues} ta gap katta harf bilan boshlanmagan.</p>`:''}
+      ${foundKw.length<t.keywords.length?`<p style="font-size:13px;color:var(--accent)">💡 Quyidagi so'zlarni ishlatishga harakat qiling: ${t.keywords.filter(k=>!foundKw.includes(k)).join(', ')}</p>`:'<p style="font-size:13px;color:var(--success)">Barcha tavsiya etilgan so\'zlar ishlatildi!</p>'}
+    </div>`;
+}
+
+function renderSentenceBuilder(){
+  const task = SENTENCE_BUILD_TASKS[Math.floor(Math.random()*SENTENCE_BUILD_TASKS.length)];
+  window._sbTask = task; window._sbAnswer = [];
+  const card = document.getElementById('sentenceBuilderCard');
+  card.innerHTML = `
+    <p style="font-size:13px;color:var(--muted)">So'zlarni to'g'ri tartibda bosing va gap tuzing:</p>
+    <div class="sentence-answer" id="sbAnswer"></div>
+    <div class="sentence-pool" id="sbPool">
+      ${shuffleArr(task.words).map((w,i)=>`<span class="sentence-chip" onclick="sbPick(this,'${w}')">${w}</span>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn btn-primary btn-sm" onclick="checkSentenceBuilder()">Tekshirish</button>
+      <button class="btn btn-ghost btn-sm" onclick="renderSentenceBuilder()">Yangi mashq</button>
+    </div>
+    <div id="sbResult" style="margin-top:8px"></div>
+  `;
+}
+function sbPick(el, word){
+  window._sbAnswer.push(word);
+  el.remove();
+  document.getElementById('sbAnswer').innerHTML += `<span class="sentence-chip" style="background:var(--accent-soft);color:#B05E00">${word}</span>`;
+}
+function checkSentenceBuilder(){
+  const built = window._sbAnswer.join(' ');
+  const ok = built.toLowerCase() === window._sbTask.answer.toLowerCase();
+  const resDiv = document.getElementById('sbResult');
+  if(ok){
+    resDiv.innerHTML = `<p style="color:var(--success);font-weight:700">✅ To'g'ri! "${built}"</p>`;
+    addXP(6,'Gap tuzish mashqi');
+  } else {
+    resDiv.innerHTML = `<p style="color:var(--danger);font-weight:700">❌ Noto'g'ri tartib. To'g'ri javob: "${window._sbTask.answer}"</p>`;
+  }
+}
+/* ---------------------------- AI CHAT TEACHER ---------------------------- */
+/* Rule-based offline "AI teacher": pattern-matches against grammar/vocab data
+   and gives explanations. No network/API calls needed => fully offline. */
+PAGE_RENDERERS.chat = function(main){
+  main.innerHTML = `
+    <div class="card">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:10px">🤖 Men faqat ingliz tilini o'rgatish bo'yicha yordam beraman. Grammatika, so'z ma'nosi yoki xatolaringiz haqida so'rang.</p>
+      <div class="chat-window scrollbar-thin" id="chatWindow"></div>
+      <div class="chat-input-row">
+        <input id="chatInput" placeholder="Savolingizni yozing... (masalan: 'Present Simple nima?')" onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn btn-primary" onclick="sendChat()">Yuborish</button>
+      </div>
+      <div class="filter-row" style="margin-top:10px">
+        <button class="chip-filter" onclick="quickChat('Present Simple nima?')">Present Simple nima?</button>
+        <button class="chip-filter" onclick="quickChat('apple nima degani?')">"apple" nima degani?</button>
+        <button class="chip-filter" onclick="quickChat('Xato qildim, tekshir: I go to school yesterday')">Gapimni tekshir</button>
+      </div>
+    </div>`;
+  const win = document.getElementById('chatWindow');
+  win.innerHTML = '';
+  if(STATE.chatHistoryTemp) STATE.chatHistoryTemp.forEach(m=>appendChatMsg(m.role,m.text,false));
+  else appendChatMsg('bot',"Salom! Men sizning ingliz tili o'qituvchingizman 🤖. Grammatika, so'zlar yoki yozgan gaplaringiz haqida so'rashingiz mumkin.", false);
+};
+function appendChatMsg(role, text, save=true){
+  const win = document.getElementById('chatWindow');
+  const div = document.createElement('div');
+  div.className = 'msg '+(role==='user'?'user':'bot');
+  div.textContent = text;
+  win.appendChild(div);
+  win.scrollTop = win.scrollHeight;
+  if(save){
+    if(!STATE.chatHistoryTemp) STATE.chatHistoryTemp = [];
+    STATE.chatHistoryTemp.push({role,text});
+    if(STATE.chatHistoryTemp.length>40) STATE.chatHistoryTemp.shift();
+  }
+}
+function quickChat(text){ document.getElementById('chatInput').value = text; sendChat(); }
+function sendChat(){
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  appendChatMsg('user', text);
+  input.value='';
+  setTimeout(()=>{ appendChatMsg('bot', aiTeacherReply(text)); }, 250);
+}
+function aiTeacherReply(msg){
+  const m = msg.toLowerCase();
+  // 1) Check if asking about a grammar topic
+  const gramHit = GRAMMAR.find(g => m.includes(g.title.toLowerCase().split(' (')[0].split(':')[0].trim().split(' ')[0].toLowerCase()) || g.title.toLowerCase().includes(m.replace(/nima\??/,'').trim()));
+  for(const g of GRAMMAR){
+    const key = g.title.toLowerCase();
+    if(m.includes(key.split('(')[0].trim()) || key.includes(m.replace(/[^a-z ]/gi,'').trim())){
+      return `📐 ${g.title}: ${g.explain} Misol: "${g.examples[0][0]}" — ${g.examples[0][1]}`;
+    }
+  }
+  // 2) Check vocabulary lookup: "X nima degani" or plain english word
+  const cleaned = m.replace(/nima degani\??/,'').replace(/[?.!]/g,'').trim();
+  let word = VOCAB.find(v=>v.en.toLowerCase()===cleaned || m.includes(v.en.toLowerCase()) );
+  if(!word){
+    // maybe they typed an uzbek word
+    word = VOCAB.find(v=>v.uz.toLowerCase()===cleaned);
+  }
+  if(word){
+    return `📚 "${word.en}" — ${word.uz}. Misol: "${word.ex}" (${word.exUz})`;
+  }
+  // 3) Simple grammar error correction pattern (e.g. "I go to school yesterday")
+  if(/yesterday|last (week|year|night)|ago/.test(m) && /\b(go|eat|see|play|work|come|do|make)\b/.test(m)){
+    return "🔍 Men bir xatoni sezdim: 'yesterday' kabi o'tmish vaqt so'zlari bilan Present Simple emas, balki Past Simple ishlatiladi. Masalan: 'go' → 'went'. To'g'ri: 'I went to school yesterday.'";
+  }
+  if(/\bi is\b/.test(m)){ return "🔍 Xato: 'I' bilan 'am' ishlatiladi, 'is' emas. To'g'ri: 'I am...'"; }
+  if(/\bhe are\b|\bshe are\b/.test(m)){ return "🔍 Xato: He/She bilan 'is' ishlatiladi, 'are' emas. To'g'ri: 'He is...' / 'She is...'"; }
+  // 4) Generic encouragement / fallback restricted to English learning
+  const fallback = [
+    "Bu qiziq savol! Iltimos, aniqroq grammatik mavzu (masalan 'Present Continuous') yoki so'z nomini yozing, men tushuntiraman.",
+    "Men faqat ingliz tili bo'yicha yordam beraman 🎓. Grammatika mavzusi, so'z tarjimasi yoki yozgan gapingizni yuboring.",
+    "Ajoyib urinish! Menga aniq bir so'z yoki gap yuborsangiz, xatolarini tahlil qilib beraman.",
+  ];
+  return fallback[Math.floor(Math.random()*fallback.length)];
+}
+
+/* ---------------------------- DAILY CHALLENGE ---------------------------- */
+PAGE_RENDERERS.daily = function(main){
+  const d = todayStr();
+  const seed = new Date().getDate() + new Date().getMonth()*31;
+  const word = VOCAB[seed % VOCAB.length];
+  const gram = GRAMMAR[seed % GRAMMAR.length];
+  const listen = LISTENINGS[seed % LISTENINGS.length];
+  const done = STATE.dailyChallengeDate === d && STATE.dailyChallengeDone;
+
+  main.innerHTML = `
+    <div class="hero-path" style="background:linear-gradient(135deg,#FF9F1C,#FF6B35)">
+      <div class="hero-top">
+        <div><h3>🎯 Bugungi vazifa</h3><p>Har kuni yangi so'z, grammatika va mashqlar. Streak: ${STATE.streak} kun 🔥</p></div>
+        ${done?'<span class="pill" style="background:#fff;color:#B05E00">✅ Bugun bajarilgan</span>':''}
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3 style="font-family:var(--font-display)">📚 Yangi so'z</h3>
+        <p style="font-size:20px;font-weight:700;margin-top:8px">${word.en} — ${word.uz}</p>
+        <p class="ex" style="margin-top:6px">${word.ex}</p>
+        <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="markWordLearned('${word.id}');showToast('So\\'z o\\'rganildi!')">✓ O'rganildi</button>
+      </div>
+      <div class="card">
+        <h3 style="font-family:var(--font-display)">📐 Grammatika</h3>
+        <p style="font-weight:700;margin-top:8px">${gram.title}</p>
+        <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="openGrammarTopic('${gram.id}')">O'rganish</button>
+      </div>
+      <div class="card">
+        <h3 style="font-family:var(--font-display)">🎧 Listening</h3>
+        <p style="font-weight:700;margin-top:8px">${listen.title}</p>
+        <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="openListening('${listen.id}')">Tinglash</button>
+      </div>
+      <div class="card">
+        <h3 style="font-family:var(--font-display)">🎤 Speaking</h3>
+        <p style="font-weight:700;margin-top:8px">"${word.en}" so'zini talaffuz qiling</p>
+        <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="navigate('speaking')">Sinab ko'rish</button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn btn-accent" onclick="completeDailyChallenge()">🏁 Bugungi vazifani yakunlash (+30 XP)</button>
+    </div>
+  `;
+};
+function completeDailyChallenge(){
+  const d = todayStr();
+  if(STATE.dailyChallengeDate===d && STATE.dailyChallengeDone){ showToast('Bugun allaqachon bajardingiz!'); return; }
+  STATE.dailyChallengeDate = d; STATE.dailyChallengeDone = true;
+  saveState();
+  addXP(30, 'Kunlik vazifa bajarildi');
+  navigate('daily');
+}
+
+/* ---------------------------- FLASHCARDS (Spaced Repetition) ---------------------------- */
+PAGE_RENDERERS.flashcards = function(main){
+  const due = getDueFlashcards();
+  window._fcQueue = due.length ? due : shuffleArr(VOCAB).slice(0,15);
+  window._fcIdx = 0;
+  renderFlashcard(main);
+};
+function getDueFlashcards(){
+  const now = Date.now();
+  return VOCAB.filter(w=>{
+    const sr = STATE.flashcardSR[w.id];
+    return sr && sr.nextReview <= now;
+  });
+}
+function renderFlashcard(main){
+  main = main || document.getElementById('mainContent');
+  const queue = window._fcQueue;
+  if(window._fcIdx >= queue.length){
+    main.innerHTML = `<div class="empty-state"><div class="ic">🎉</div><p>Barcha kartalar takrorlandi! Keyinroq qayting.</p>
+      <button class="btn btn-primary" style="margin-top:10px" onclick="navigate('flashcards')">Yana boshlash</button></div>`;
+    return;
+  }
+  const w = queue[window._fcIdx];
+  main.innerHTML = `
+    <p style="text-align:center;color:var(--muted);font-size:13px;margin-bottom:10px">Karta ${window._fcIdx+1} / ${queue.length}</p>
+    <div class="flash-stage">
+      <div class="flash-card" id="flashCardEl" onclick="this.classList.toggle('flipped')">
+        <div class="flash-face flash-front">
+          <div class="big">${w.en}</div>
+          <p style="opacity:.85;font-size:13px">/${w.ipa}/</p>
+          <p style="font-size:12px;opacity:.75">(bosing — tarjimasini ko'rish)</p>
+        </div>
+        <div class="flash-face flash-back">
+          <div class="big">${w.uz}</div>
+          <p style="font-size:13px">${w.ex}</p>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center;gap:10px;margin-top:22px">
+      <button class="btn btn-danger" onclick="answerFlashcard('${w.id}', false)">😕 Bilmadim</button>
+      <button class="btn btn-ghost" onclick="speak('${w.en.replace(/'/g,"\\'")}')">🔊</button>
+      <button class="btn" style="background:var(--success-soft);color:var(--success)" onclick="answerFlashcard('${w.id}', true)">😊 Bildim</button>
+    </div>
+  `;
+}
+function answerFlashcard(wordId, knew){
+  let sr = STATE.flashcardSR[wordId] || {interval:1, ease:2.3, reps:0};
+  if(knew){
+    sr.reps += 1;
+    sr.interval = Math.round(sr.interval * sr.ease);
+    sr.ease = Math.min(3, sr.ease + 0.1);
+    markWordLearned(wordId);
+  } else {
+    sr.reps = 0;
+    sr.interval = 1;
+    sr.ease = Math.max(1.3, sr.ease - 0.2);
+  }
+  sr.nextReview = Date.now() + sr.interval*24*60*60*1000;
+  STATE.flashcardSR[wordId] = sr;
+  saveState();
+  window._fcIdx++;
+  renderFlashcard();
+}
+
+/* ---------------------------- QUIZ HUB ---------------------------- */
+PAGE_RENDERERS.quiz = function(main){
+  main.innerHTML = `
+    <div class="grid grid-3">
+      <div class="card card-hover" onclick="quizMCQ()"><h3>📝 Variantli test</h3><p style="color:var(--muted);font-size:13px;margin-top:6px">So'z tarjimasini toping</p></div>
+      <div class="card card-hover" onclick="quizMatching()"><h3>🔗 Matching</h3><p style="color:var(--muted);font-size:13px;margin-top:6px">Inglizcha-o'zbekcha juftlash</p></div>
+      <div class="card card-hover" onclick="quizTyping()"><h3>⌨️ Typing test</h3><p style="color:var(--muted);font-size:13px;margin-top:6px">Tarjimasini yozing</p></div>
+      <div class="card card-hover" onclick="quizListening()"><h3>🎧 Listening quiz</h3><p style="color:var(--muted);font-size:13px;margin-top:6px">Eshitib, so'zni toping</p></div>
+      <div class="card card-hover" onclick="navigate('speaking')"><h3>🗣️ Speaking quiz</h3><p style="color:var(--muted);font-size:13px;margin-top:6px">Speaking bo'limiga o'tish</p></div>
+      <div class="card card-hover" onclick="quizDragDrop()"><h3>🧩 Drag & Drop</h3><p style="color:var(--muted);font-size:13px;margin-top:6px">So'zlarni kategoriyaga joylashtiring</p></div>
+    </div>
+  `;
+};
+function quizMCQ(){
+  const words = shuffleArr(VOCAB).slice(0,10);
+  const qs = words.map(w=>{
+    const wrongs = shuffleArr(VOCAB.filter(v=>v.id!==w.id)).slice(0,3).map(v=>v.uz);
+    const options = shuffleArr([w.uz, ...wrongs]);
+    return {q:`"${w.en}" tarjimasi?`, options, correct: options.indexOf(w.uz)};
+  });
+  runGenericQuiz(qs, 'Variantli test', (score,total)=>{ logSkillScore('vocabulary', Math.round(score/total*100)); addXP(score*2,'Quiz'); saveState(); });
+}
+function quizTyping(){
+  const words = shuffleArr(VOCAB).slice(0,8);
+  let idx=0, score=0;
+  const main = document.getElementById('mainContent');
+  function render(){
+    if(idx>=words.length){
+      logSkillScore('vocabulary', Math.round(score/words.length*100));
+      main.innerHTML = `<div class="card" style="text-align:center;padding:40px"><h2>Natija: ${score}/${words.length}</h2><button class="btn btn-primary" style="margin-top:14px" onclick="navigate('quiz')">Orqaga</button></div>`;
+      return;
+    }
+    const w = words[idx];
+    main.innerHTML = `<div class="card">
+      <p style="color:var(--muted);font-size:12px;font-weight:700">SO'Z ${idx+1}/${words.length}</p>
+      <h3 style="font-family:var(--font-display);font-size:22px;margin:10px 0">${w.uz}</h3>
+      <p style="font-size:12px;color:var(--muted)">Inglizcha tarjimasini yozing:</p>
+      <input class="search-input" id="typingInput" style="margin-top:8px" onkeydown="if(event.key==='Enter')submitTyping('${w.id}','${w.en}')">
+      <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="submitTyping('${w.id}','${w.en}')">Tekshirish</button>
+      <div id="typingRes" style="margin-top:8px"></div>
+    </div>`;
+    document.getElementById('typingInput').focus();
+  }
+  window.submitTyping = function(id, correctWord){
+    const val = document.getElementById('typingInput').value.trim().toLowerCase();
+    const ok = val === correctWord.toLowerCase();
+    if(ok) score++;
+    document.getElementById('typingRes').innerHTML = ok ? `<p style="color:var(--success)">✅ To'g'ri!</p>` : `<p style="color:var(--danger)">❌ To'g'ri javob: ${correctWord}</p>`;
+    setTimeout(()=>{ idx++; render(); }, 900);
+  };
+  render();
+}
+function quizListening(){
+  const words = shuffleArr(VOCAB).slice(0,8);
+  const qs = words.map(w=>{
+    const wrongs = shuffleArr(VOCAB.filter(v=>v.id!==w.id)).slice(0,3).map(v=>v.en);
+    const options = shuffleArr([w.en, ...wrongs]);
+    return {q:`🔊 Eshiting va to'g'ri so'zni tanlang`, options, correct: options.indexOf(w.en), audio:w.en};
+  });
+  let idx=0, score=0;
+  const main = document.getElementById('mainContent');
+  function render(){
+    if(idx>=qs.length){
+      logSkillScore('listening', Math.round(score/qs.length*100));
+      main.innerHTML = `<div class="card" style="text-align:center;padding:40px"><h2>Natija: ${score}/${qs.length}</h2><button class="btn btn-primary" style="margin-top:14px" onclick="navigate('quiz')">Orqaga</button></div>`;
+      return;
+    }
+    const q = qs[idx];
+    main.innerHTML = `<div class="card">
+      <p style="color:var(--muted);font-size:12px;font-weight:700">SAVOL ${idx+1}/${qs.length}</p>
+      <button class="btn btn-accent" style="margin:10px 0" onclick="speak('${q.audio.replace(/'/g,"\\'")}')">🔊 Qayta eshitish</button>
+      <div id="lqOpts">${q.options.map((o,i)=>`<button class="quiz-opt" onclick="lqSelect(${i})">${o}</button>`).join('')}</div>
+    </div>`;
+    speak(q.audio);
+    window.lqSelect = function(i){
+      const opts = $all('#lqOpts .quiz-opt');
+      opts.forEach((el,j)=>{ el.classList.toggle('correct', j===q.correct); if(j===i && i!==q.correct) el.classList.add('wrong'); });
+      if(i===q.correct) score++;
+      setTimeout(()=>{ idx++; render(); }, 900);
+    };
+  }
+  render();
+}
+function quizMatching(){
+  const words = shuffleArr(VOCAB).slice(0,6);
+  window._matchLeft = shuffleArr(words.map(w=>({id:w.id,text:w.en})));
+  window._matchRight = shuffleArr(words.map(w=>({id:w.id,text:w.uz})));
+  window._matchSelected = null; window._matchDone = {};
+  renderMatching();
+}
+function renderMatching(){
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="card">
+      <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Inglizcha so'zni, so'ng tarjimasini bosing.</p>
+      <div class="grid grid-2">
+        <div id="matchLeft">${window._matchLeft.map(x=>`<button class="quiz-opt ${window._matchDone[x.id]?'correct':''}" ${window._matchDone[x.id]?'disabled':''} onclick="matchPick('L','${x.id}')">${x.text}</button>`).join('')}</div>
+        <div id="matchRight">${window._matchRight.map(x=>`<button class="quiz-opt ${window._matchDone[x.id]?'correct':''}" ${window._matchDone[x.id]?'disabled':''} onclick="matchPick('R','${x.id}')">${x.text}</button>`).join('')}</div>
+      </div>
+      <p id="matchStatus" style="margin-top:10px;color:var(--muted);font-size:13px"></p>
+    </div>`;
+}
+function matchPick(side, id){
+  if(window._matchDone[id]) return;
+  if(!window._matchSelected){ window._matchSelected = {side,id}; return; }
+  if(window._matchSelected.side===side){ window._matchSelected = {side,id}; return; }
+  if(window._matchSelected.id===id){
+    window._matchDone[id]=true;
+    window._matchSelected=null;
+    renderMatching();
+    const allDone = Object.keys(window._matchDone).length === window._matchLeft.length;
+    if(allDone){ addXP(15,'Matching tugatildi'); showToast('🎉 Barcha juftlar topildi!'); }
+  } else {
+    document.getElementById('matchStatus').textContent = '❌ Mos kelmadi, qayta urinib ko\'ring.';
+    window._matchSelected=null;
+  }
+}
+function quizDragDrop(){
+  const cats = shuffleArr(Object.keys(CATEGORY_META)).slice(0,3);
+  const words = shuffleArr(VOCAB.filter(w=>cats.includes(w.cat))).slice(0,9);
+  window._ddPlaced = {};
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="card">
+      <p style="color:var(--muted);font-size:13px;margin-bottom:10px">So'zlarni to'g'ri kategoriya katagiga bosib joylashtiring.</p>
+      <div class="sentence-pool" id="ddPool">${words.map(w=>`<span class="sentence-chip" id="ddw_${w.id}" onclick="ddSelectWord('${w.id}')">${w.en}</span>`).join('')}</div>
+      <div class="grid grid-3" style="margin-top:14px">
+        ${cats.map(c=>`<div class="card" style="min-height:90px" onclick="ddDrop('${c}')"><b>${CATEGORY_META[c].icon} ${CATEGORY_META[c].label.split(' / ')[0]}</b><div id="ddzone_${c}" style="font-size:12px;margin-top:6px;color:var(--muted)"></div></div>`).join('')}
+      </div>
+      <p id="ddStatus" style="margin-top:10px;color:var(--muted);font-size:13px">So'zni tanlang, keyin kategoriyani bosing.</p>
+    </div>`;
+  window._ddWords = words;
+}
+function ddSelectWord(id){ window._ddSelected = id; document.getElementById('ddStatus').textContent = 'Tanlandi: '+vocabById(id).en+'. Endi kategoriyani bosing.'; }
+function ddDrop(cat){
+  if(!window._ddSelected) return;
+  const w = vocabById(window._ddSelected);
+  const correct = w.cat === cat;
+  const zone = document.getElementById('ddzone_'+cat);
+  zone.innerHTML += `<div>${correct?'✅':'❌'} ${w.en}</div>`;
+  const chip = document.getElementById('ddw_'+w.id);
+  if(chip) chip.remove();
+  window._ddPlaced[w.id] = correct;
+  window._ddSelected = null;
+  const allPlaced = Object.keys(window._ddPlaced).length === window._ddWords.length;
+  if(allPlaced){
+    const correctCount = Object.values(window._ddPlaced).filter(Boolean).length;
+    document.getElementById('ddStatus').innerHTML = `<b>Natija: ${correctCount}/${window._ddWords.length}</b>`;
+    addXP(correctCount*2, 'Drag & Drop');
+  }
+}
+/* ---------------------------- PRONUNCIATION CHECKER ---------------------------- */
+PAGE_RENDERERS.pronunciation = function(main){
+  window._pronQueue = shuffleArr(VOCAB).slice(0,25);
+  window._pronIdx = 0;
+  renderPronScreen(main);
+};
+function renderPronScreen(main){
+  main = main || document.getElementById('mainContent');
+  const w = window._pronQueue[window._pronIdx % window._pronQueue.length];
+  main.innerHTML = `
+    <div class="card" style="text-align:center;padding:32px">
+      <p style="color:var(--muted);font-size:13px;font-weight:700">SO'ZNI TALAFFUZ QILING</p>
+      <h2 style="font-family:var(--font-display);font-size:36px;margin:14px 0">${w.en}</h2>
+      <p style="color:var(--muted);font-family:var(--font-mono)">/${w.ipa}/</p>
+      <button class="btn btn-ghost btn-sm" onclick="speak('${w.en.replace(/'/g,"\\'")}')">🔊 Namuna</button>
+      <div class="mic-btn" id="pronMic" onclick="checkPronunciation('${w.en.replace(/'/g,"\\'")}')">🎤</div>
+      <div id="pronResult"></div>
+      <button class="btn btn-outline" style="margin-top:16px" onclick="window._pronIdx++;renderPronScreen()">Keyingi so'z →</button>
+    </div>`;
+}
+function checkPronunciation(target){
+  const rec = getRecognition();
+  const mic = document.getElementById('pronMic');
+  const resBox = document.getElementById('pronResult');
+  if(!rec){
+    resBox.innerHTML = `<p style="color:var(--danger);margin-top:10px">Ovoz tanish qo'llab-quvvatlanmaydi. Chrome brauzeridan foydalaning.</p>`;
+    return;
+  }
+  mic.classList.add('listening');
+  try{
+    rec.start();
+    rec.onresult = (e)=>{
+      const said = e.results[0][0].transcript;
+      mic.classList.remove('listening');
+      const pct = similarityPct(target, said);
+      const color = pct>=80?'var(--success)':(pct>=50?'var(--accent)':'var(--danger)');
+      const targetLetters = target.toLowerCase().split('');
+      const saidLetters = said.toLowerCase().split('');
+      let diffHtml = '';
+      targetLetters.forEach((ch,i)=>{
+        const match = saidLetters[i]===ch;
+        diffHtml += `<span style="color:${match?'var(--success)':'var(--danger)'};font-weight:700">${ch}</span>`;
+      });
+      logSkillScore('speaking', pct);
+      resBox.innerHTML = `
+        <div class="result-box" style="background:var(--surface-2)">
+          <div class="score-ring" style="border:6px solid ${color};color:${color}">${pct}%</div>
+          <p style="margin-top:10px;font-family:var(--font-mono);font-size:18px">${diffHtml}</p>
+          <p style="font-size:13px;color:var(--muted);margin-top:6px">Siz aytdingiz: "${escapeHtml(said)}"</p>
+          ${pct<80?'<p style="color:var(--danger);font-size:13px;margin-top:6px">Qizil harflar noto\'g\'ri talaffuz qilingan tovushlarni bildiradi. Qayta urinib ko\'ring.</p>':'<p style="color:var(--success);font-size:13px;margin-top:6px">Ajoyib! 🎉</p>'}
+        </div>`;
+      if(pct>=70) addXP(5,'Pronunciation mashqi');
+    };
+    rec.onerror = ()=>{ mic.classList.remove('listening'); resBox.innerHTML = '<p style="color:var(--danger)">Xatolik yuz berdi, qayta urinib ko\'ring.</p>'; };
+    rec.onend = ()=> mic.classList.remove('listening');
+  }catch(err){ mic.classList.remove('listening'); console.warn(err); }
+}
+
+/* ---------------------------- CONVERSATION PRACTICE ---------------------------- */
+PAGE_RENDERERS.conversation = function(main){
+  main.innerHTML = `<div class="grid grid-3" id="convGrid"></div>`;
+  document.getElementById('convGrid').innerHTML = CONVERSATIONS.map(c=>`
+    <div class="card card-hover" onclick="openConversation('${c.id}')">
+      <div style="font-size:30px">${c.icon}</div>
+      <h3 style="font-family:var(--font-display);margin-top:8px">${c.title}</h3>
+      <p style="color:var(--muted);font-size:13px;margin-top:4px">${c.lines.length} bosqichli dialog</p>
+    </div>`).join('');
+};
+function openConversation(id){
+  const c = CONVERSATIONS.find(x=>x.id===id);
+  window._convState = {id, step:0, history:[]};
+  renderConversationStep();
+}
+function renderConversationStep(){
+  const c = CONVERSATIONS.find(x=>x.id===window._convState.id);
+  const main = document.getElementById('mainContent');
+  const step = window._convState.step;
+  if(step >= c.lines.length){
+    main.innerHTML = `
+      <button class="btn btn-ghost btn-sm" onclick="navigate('conversation')">← Orqaga</button>
+      <div class="card" style="text-align:center;padding:40px;margin-top:14px">
+        <div style="font-size:44px">🎉</div>
+        <h2 style="font-family:var(--font-display);margin:10px 0">Dialog tugadi!</h2>
+        <p style="color:var(--muted)">${c.title} suhbatini muvaffaqiyatli yakunladingiz.</p>
+      </div>`;
+    addXP(15, c.title+' suhbati tugatildi');
+    return;
+  }
+  const line = c.lines[step];
+  const historyHtml = window._convState.history.map(h=>`
+    <div class="dialogue-line"><div class="avatar">🤵</div><div class="bubble">${h.sys}</div></div>
+    <div class="dialogue-line me"><div class="avatar">🙂</div><div class="bubble">${h.picked}</div></div>
+  `).join('');
+  main.innerHTML = `
+    <button class="btn btn-ghost btn-sm" onclick="navigate('conversation')">← Orqaga</button>
+    <div class="card" style="margin-top:14px">
+      <h3 style="font-family:var(--font-display)">${c.icon} ${c.title}</h3>
+      <div style="margin-top:14px" id="convHistory">${historyHtml}</div>
+      <div class="dialogue-line"><div class="avatar">🤵</div><div class="bubble">${line.sys} <button class="btn btn-ghost btn-sm" onclick="speak('${line.sys.replace(/'/g,"\\'")}')">🔊</button></div></div>
+      <p style="font-size:12px;color:var(--muted);margin:10px 0 6px">Javobingizni tanlang:</p>
+      ${line.options.map((o,i)=>`<button class="quiz-opt" onclick="pickConvOption(${i})">${o}</button>`).join('')}
+    </div>`;
+}
+function pickConvOption(i){
+  const c = CONVERSATIONS.find(x=>x.id===window._convState.id);
+  const line = c.lines[window._convState.step];
+  const opts = $all('#mainContent .quiz-opt');
+  opts.forEach((el,j)=>{ if(j===line.correct) el.classList.add('correct'); else if(j===i) el.classList.add('wrong'); });
+  if(i===line.correct) addXP(4,'To\'g\'ri javob');
+  window._convState.history.push({sys:line.sys, picked:line.options[i]});
+  setTimeout(()=>{ window._convState.step++; renderConversationStep(); }, 700);
+}
+
+/* ---------------------------- MINI GAMES ---------------------------- */
+PAGE_RENDERERS.games = function(main){
+  main.innerHTML = `
+    <div class="grid grid-3">
+      <div class="card card-hover" onclick="playHangman()"><div style="font-size:30px">🪢</div><h3 style="font-family:var(--font-display);margin-top:8px">Hangman</h3><p style="color:var(--muted);font-size:13px">So'zni harflab toping</p></div>
+      <div class="card card-hover" onclick="playMemory()"><div style="font-size:30px">🧠</div><h3 style="font-family:var(--font-display);margin-top:8px">Memory Game</h3><p style="color:var(--muted);font-size:13px">Juftlarni topib xotirani mashq qiling</p></div>
+      <div class="card card-hover" onclick="playWordPuzzle()"><div style="font-size:30px">🧩</div><h3 style="font-family:var(--font-display);margin-top:8px">Word Puzzle</h3><p style="color:var(--muted);font-size:13px">Aralashgan harflardan so'z toping</p></div>
+      <div class="card card-hover" onclick="quizMatching()"><div style="font-size:30px">🔗</div><h3 style="font-family:var(--font-display);margin-top:8px">Word Match</h3><p style="color:var(--muted);font-size:13px">So'zlarni juftlashtirish</p></div>
+      <div class="card card-hover" onclick="navigate('writing')"><div style="font-size:30px">🏗️</div><h3 style="font-family:var(--font-display);margin-top:8px">Sentence Builder</h3><p style="color:var(--muted);font-size:13px">Writing bo'limiga o'tish</p></div>
+      <div class="card card-hover" onclick="playSpeedQuiz()"><div style="font-size:30px">⚡</div><h3 style="font-family:var(--font-display);margin-top:8px">Speed Quiz</h3><p style="color:var(--muted);font-size:13px">30 soniyada nechta to'g'ri topasiz?</p></div>
+    </div>
+  `;
+};
+
+/* Hangman */
+function playHangman(){
+  const w = shuffleArr(VOCAB)[0];
+  window._hmWord = w.en.toLowerCase();
+  window._hmGuessed = new Set();
+  window._hmWrong = 0;
+  window._hmMax = 6;
+  window._hmWordData = w;
+  renderHangman();
+}
+function renderHangman(){
+  const main = document.getElementById('mainContent');
+  const word = window._hmWord;
+  const guessed = window._hmGuessed;
+  const display = word.split('').map(ch=> ch===' ' ? ' ' : (guessed.has(ch)?ch:'_'));
+  const lost = window._hmWrong >= window._hmMax;
+  const won = word.split('').every(ch=> ch===' ' || guessed.has(ch));
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+  main.innerHTML = `
+    <div class="card" style="text-align:center">
+      <p style="color:var(--muted);font-size:13px">Kategoriya: ${CATEGORY_META[window._hmWordData.cat].label}</p>
+      <p style="margin:10px 0">Xato: ${window._hmWrong}/${window._hmMax}</p>
+      <div class="hangman-word">${display.map(c=>`<span>${c}</span>`).join('')}</div>
+      <div class="kbd-row">
+        ${alphabet.map(l=>{
+          let cls='kbd-key';
+          if(guessed.has(l)) cls += word.includes(l) ? ' used-good':' used-bad';
+          return `<button class="${cls}" ${guessed.has(l)||lost||won?'disabled':''} onclick="hangmanGuess('${l}')">${l}</button>`;
+        }).join('')}
+      </div>
+      ${won?'<p style="color:var(--success);font-weight:700;margin-top:14px">🎉 G\'alaba! So\'z: '+word+'</p>':''}
+      ${lost?'<p style="color:var(--danger);font-weight:700;margin-top:14px">😢 Yutqazdingiz. So\'z: '+word+'</p>':''}
+      ${(won||lost)?'<button class="btn btn-primary" style="margin-top:10px" onclick="playHangman()">Yana o\'ynash</button>':''}
+    </div>`;
+  if(won && !window._hmRewarded){ addXP(10,'Hangman g\'alabasi'); window._hmRewarded = true; }
+}
+function hangmanGuess(letter){
+  window._hmGuessed.add(letter);
+  if(!window._hmWord.includes(letter)) window._hmWrong++;
+  window._hmRewarded = false;
+  renderHangman();
+}
+
+/* Memory Game */
+function playMemory(){
+  const words = shuffleArr(VOCAB).slice(0,8);
+  let tiles = [];
+  words.forEach(w=>{ tiles.push({key:w.id,text:w.en,type:'en'}); tiles.push({key:w.id,text:w.uz,type:'uz'}); });
+  tiles = shuffleArr(tiles);
+  window._memTiles = tiles;
+  window._memRevealed = [];
+  window._memMatched = new Set();
+  renderMemory();
+}
+function renderMemory(){
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="card">
+      <p style="text-align:center;color:var(--muted);font-size:13px;margin-bottom:10px">Juftlarni toping: inglizcha so'z + tarjimasi</p>
+      <div class="memory-grid" id="memGrid">
+        ${window._memTiles.map((t,i)=>{
+          const revealed = window._memRevealed.includes(i);
+          const matched = window._memMatched.has(i);
+          return `<div class="memory-tile ${revealed||matched?'revealed':''} ${matched?'matched':''}" onclick="memPick(${i})">${revealed||matched?t.text:'?'}</div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+function memPick(i){
+  if(window._memMatched.has(i) || window._memRevealed.includes(i)) return;
+  if(window._memRevealed.length>=2) return;
+  window._memRevealed.push(i);
+  renderMemory();
+  if(window._memRevealed.length===2){
+    const [a,b] = window._memRevealed;
+    const ta = window._memTiles[a], tb = window._memTiles[b];
+    if(ta.key===tb.key && ta.type!==tb.type){
+      window._memMatched.add(a); window._memMatched.add(b);
+      window._memRevealed = [];
+      setTimeout(renderMemory, 300);
+      if(window._memMatched.size === window._memTiles.length){ addXP(15,'Memory Game g\'alabasi'); setTimeout(()=>showToast('🎉 Barcha juftlar topildi!'),350); }
+    } else {
+      setTimeout(()=>{ window._memRevealed=[]; renderMemory(); }, 800);
+    }
+  }
+}
+
+/* Word Puzzle (unscramble) */
+function playWordPuzzle(){
+  const w = shuffleArr(VOCAB)[0];
+  window._wpWord = w;
+  window._wpScrambled = shuffleArr(w.en.split(''));
+  window._wpBuilt = [];
+  renderWordPuzzle();
+}
+function renderWordPuzzle(){
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="card" style="text-align:center">
+      <p style="color:var(--muted);font-size:13px">Tarjimasi: <b>${window._wpWord.uz}</b></p>
+      <div class="sentence-answer" id="wpAnswer" style="justify-content:center;margin-top:14px">
+        ${window._wpBuilt.map(c=>`<span class="sentence-chip">${c}</span>`).join('')}
+      </div>
+      <div class="sentence-pool" id="wpPool" style="justify-content:center">
+        ${window._wpScrambled.map((c,i)=>`<span class="sentence-chip" onclick="wpPick(${i})" id="wpc_${i}">${c}</span>`).join('')}
+      </div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="playWordPuzzle()">Yangi so'z</button>
+      <div id="wpResult" style="margin-top:8px"></div>
+    </div>`;
+}
+function wpPick(i){
+  const chip = document.getElementById('wpc_'+i);
+  if(!chip) return;
+  window._wpBuilt.push(window._wpScrambled[i]);
+  chip.remove();
+  const built = window._wpBuilt.join('');
+  if(built.length === window._wpWord.en.length){
+    const resDiv = document.getElementById('wpResult');
+    if(built.toLowerCase()===window._wpWord.en.toLowerCase()){
+      resDiv.innerHTML = `<p style="color:var(--success);font-weight:700">✅ To'g'ri! "${built}"</p>`;
+      addXP(8,'Word Puzzle');
+      markWordLearned(window._wpWord.id);
+    } else {
+      resDiv.innerHTML = `<p style="color:var(--danger);font-weight:700">❌ To'g'ri javob: ${window._wpWord.en}</p>`;
+    }
+  } else {
+    document.getElementById('wpAnswer').innerHTML = window._wpBuilt.map(c=>`<span class="sentence-chip">${c}</span>`).join('');
+  }
+}
+
+/* Speed Quiz */
+function playSpeedQuiz(){
+  window._sqScore = 0;
+  window._sqTimeLeft = 30;
+  window._sqActive = true;
+  nextSpeedQuestion();
+  window._sqTimer = setInterval(()=>{
+    window._sqTimeLeft--;
+    const timerEl = document.getElementById('sqTimer');
+    if(timerEl) timerEl.textContent = window._sqTimeLeft;
+    if(window._sqTimeLeft<=0){ endSpeedQuiz(); }
+  }, 1000);
+}
+function nextSpeedQuestion(){
+  if(!window._sqActive) return;
+  const w = shuffleArr(VOCAB)[0];
+  const wrongs = shuffleArr(VOCAB.filter(v=>v.id!==w.id)).slice(0,3).map(v=>v.uz);
+  const options = shuffleArr([w.uz, ...wrongs]);
+  window._sqCurrent = {w, options, correct: options.indexOf(w.uz)};
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="card" style="text-align:center">
+      <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-weight:700">
+        <span>⏱️ <span id="sqTimer">${window._sqTimeLeft}</span>s</span><span>Ball: ${window._sqScore}</span>
+      </div>
+      <h3 style="font-family:var(--font-display);font-size:24px;margin:16px 0">${w.en}</h3>
+      <div id="sqOpts">${options.map((o,i)=>`<button class="quiz-opt" onclick="sqAnswer(${i})">${o}</button>`).join('')}</div>
+    </div>`;
+}
+function sqAnswer(i){
+  if(i===window._sqCurrent.correct) window._sqScore++;
+  nextSpeedQuestion();
+}
+function endSpeedQuiz(){
+  window._sqActive = false;
+  clearInterval(window._sqTimer);
+  addXP(window._sqScore, 'Speed Quiz');
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `<div class="card" style="text-align:center;padding:40px"><div style="font-size:44px">⚡</div><h2 style="font-family:var(--font-display);margin:10px 0">Vaqt tugadi!</h2><p style="font-size:30px;font-weight:800;font-family:var(--font-mono);color:var(--primary)">${window._sqScore} ball</p><button class="btn btn-primary" style="margin-top:14px" onclick="navigate('games')">Orqaga</button></div>`;
+}
+/* ---------------------------- DICTIONARY ---------------------------- */
+PAGE_RENDERERS.dictionary = function(main){
+  main.innerHTML = `
+    <input class="search-input" id="dictSearch" placeholder="Inglizcha yoki o'zbekcha so'zni qidiring..." oninput="renderDictResults(this.value)">
+    <div id="dictResults" style="margin-top:16px"></div>
+  `;
+  renderDictResults('');
+};
+function renderDictResults(q){
+  const box = document.getElementById('dictResults');
+  q = q.trim().toLowerCase();
+  let list = q ? VOCAB.filter(w=>w.en.toLowerCase().includes(q) || w.uz.toLowerCase().includes(q)) : VOCAB.slice(0,12);
+  if(list.length===0){ box.innerHTML = `<div class="empty-state"><div class="ic">📕</div><p>Hech narsa topilmadi.</p></div>`; return; }
+  box.innerHTML = `<div class="grid grid-3">${list.map(w=>wordCardHtml(w)).join('')}</div>`;
+}
+
+/* ---------------------------- NOTEBOOK ---------------------------- */
+PAGE_RENDERERS.notebook = function(main){
+  main.innerHTML = `
+    <div class="card" style="margin-bottom:16px">
+      <p style="color:var(--muted);font-size:13px">Vocabulary bo'limida 📓 tugmasini bosib so'zlarni bu yerga saqlashingiz mumkin. Har bir yozuvga izoh qo'shing.</p>
+    </div>
+    <div id="notebookList"></div>
+  `;
+  renderNotebookList();
+};
+function renderNotebookList(){
+  const box = document.getElementById('notebookList');
+  if(STATE.notebook.length===0){
+    box.innerHTML = `<div class="empty-state"><div class="ic">📓</div><p>Daftaringiz hali bo'sh. Vocabulary bo'limidan so'z qo'shing.</p>
+      <button class="btn btn-primary" style="margin-top:10px" onclick="navigate('vocabulary')">So'zlarga o'tish</button></div>`;
+    return;
+  }
+  const byCat = {};
+  STATE.notebook.forEach(n=>{ (byCat[n.cat]=byCat[n.cat]||[]).push(n); });
+  box.innerHTML = Object.keys(byCat).map(cat=>`
+    <div class="section-title">${CATEGORY_META[cat]?CATEGORY_META[cat].icon:'📁'} ${CATEGORY_META[cat]?CATEGORY_META[cat].label:cat}</div>
+    <div class="grid grid-2">
+      ${byCat[cat].map(n=>`
+        <div class="card note-item">
+          <div style="display:flex;justify-content:space-between"><b>${n.en}</b><button class="btn btn-ghost btn-sm" onclick="removeNote('${n.id}')">🗑️</button></div>
+          <p style="color:var(--primary);font-size:13px">${n.uz}</p>
+          <textarea class="search-input" style="margin-top:6px;font-size:13px" rows="2" placeholder="Shaxsiy izoh qoldiring..." onchange="updateNote('${n.id}', this.value)">${escapeHtml(n.note||'')}</textarea>
+        </div>`).join('')}
+    </div>
+  `).join('');
+}
+function removeNote(id){ STATE.notebook = STATE.notebook.filter(n=>n.id!==id); saveState(); renderNotebookList(); }
+function updateNote(id, val){ const n = STATE.notebook.find(x=>x.id===id); if(n){ n.note = val; saveState(); } }
+
+/* ---------------------------- STATISTICS ---------------------------- */
+PAGE_RENDERERS.statistics = function(main){
+  main.innerHTML = `
+    <div class="grid grid-4" style="margin-bottom:20px">
+      <div class="card stat-card"><b>${Object.keys(STATE.learnedWords).length}</b><span class="lbl">Jami o'rganilgan so'z</span></div>
+      <div class="card stat-card"><b>${Object.keys(STATE.completedLessons).length}</b><span class="lbl">Tugatilgan darslar</span></div>
+      <div class="card stat-card"><b>${STATE.streak}</b><span class="lbl">Kunlik streak</span></div>
+      <div class="card stat-card"><b>${STATE.xp}</b><span class="lbl">Jami XP</span></div>
+    </div>
+    <div class="section-title">📅 Kunlik (so'nggi 7 kun)</div>
+    <div class="card chart-card"><canvas id="statDaily"></canvas></div>
+    <div class="section-title">🗓️ Oylik (so'nggi 30 kun)</div>
+    <div class="card chart-card"><canvas id="statMonthly"></canvas></div>
+    <div class="section-title">📊 Yillik (oylar bo'yicha XP)</div>
+    <div class="card chart-card"><canvas id="statYearly"></canvas></div>
+  `;
+  drawBarChart('statDaily', last7DaysData());
+  drawBarChart('statMonthly', last30DaysData());
+  drawBarChart('statYearly', yearlyXpData());
+};
+function yearlyXpData(){
+  const months = ['Yan','Fev','Mar','Apr','May','Iyun','Iyul','Avg','Sen','Okt','Noy','Dek'];
+  const out = months.map(m=>({label:m, value:0}));
+  Object.keys(STATE.dailyLog).forEach(dateStr=>{
+    const m = new Date(dateStr).getMonth();
+    out[m].value += STATE.dailyLog[dateStr].xp || 0;
+  });
+  return out;
+}
+
+/* ---------------------------- AI ANALYSIS ---------------------------- */
+PAGE_RENDERERS.analysis = function(main){
+  const skills = ['speaking','listening','grammar','vocabulary','reading','writing'];
+  const avg = {};
+  skills.forEach(s=>{
+    const arr = STATE.skillScores[s] || [];
+    avg[s] = arr.length ? Math.round(arr.reduce((a,b)=>a+b.pct,0)/arr.length) : null;
+  });
+  const scored = skills.filter(s=>avg[s]!==null);
+  let weakest = null, strongest = null;
+  if(scored.length){
+    weakest = scored.reduce((a,b)=> avg[a]<=avg[b]?a:b);
+    strongest = scored.reduce((a,b)=> avg[a]>=avg[b]?a:b);
+  }
+  const skillLabels = {speaking:'Speaking 🎤',listening:'Listening 🎧',grammar:'Grammar 📐',vocabulary:'Vocabulary 📚',reading:'Reading 📖',writing:'Writing ✍️'};
+  const recMap = {speaking:'speaking', listening:'listening', grammar:'grammar', vocabulary:'vocabulary', reading:'reading', writing:'writing'};
+
+  main.innerHTML = `
+    <div class="card" style="margin-bottom:18px">
+      <p style="color:var(--muted);font-size:13px">Bu tahlil sizning testlar va mashqlardagi natijalaringiz asosida avtomatik hisoblanadi (offline, lokal algoritm).</p>
+    </div>
+    <div class="grid grid-3" id="analysisGrid"></div>
+    <div class="section-title">🧠 Xulosa va tavsiya</div>
+    <div class="card">
+      ${scored.length===0 ? `<p style="color:var(--muted)">Hali yetarli ma'lumot yo'q. Testlar va mashqlarni bajaring — tahlil avtomatik shakllanadi.</p>` : `
+        <p>💪 Sizning eng kuchli tomoningiz: <b style="color:var(--success)">${skillLabels[strongest]}</b> (${avg[strongest]}%)</p>
+        <p style="margin-top:6px">⚠️ Ko'proq e'tibor talab qiladigan soha: <b style="color:var(--danger)">${skillLabels[weakest]}</b> (${avg[weakest]}%)</p>
+        <button class="btn btn-primary" style="margin-top:14px" onclick="navigate('${recMap[weakest]==='vocabulary'?'vocabulary':(recMap[weakest]==='grammar'?'grammar':recMap[weakest])}')">${skillLabels[weakest]} bo'yicha mashq qilish →</button>
+      `}
+    </div>
+  `;
+  document.getElementById('analysisGrid').innerHTML = skills.map(s=>{
+    const val = avg[s];
+    const pct = val===null?0:val;
+    const color = val===null?'var(--muted)':(pct>=70?'var(--success)':(pct>=40?'var(--accent)':'var(--danger)'));
+    return `<div class="card stat-card">
+      <div class="top"><span class="lbl">${skillLabels[s]}</span></div>
+      <b style="color:${color}">${val===null?'—':pct+'%'}</b>
+      <div class="progress-bar"><i style="width:${pct}%;background:${color}"></i></div>
+    </div>`;
+  }).join('');
+};
+
+/* ==========================================================================
+   APP INIT
+   ========================================================================== */
+function init(){
+  applyTheme();
+  renderNav();
+  updateHeaderStats();
+  touchStreak();
+  navigate('dashboard');
+
+  window.addEventListener('online', updateHeaderStats);
+  window.addEventListener('offline', updateHeaderStats);
+  window.addEventListener('resize', ()=>{
+    // redraw charts responsively if visible
+    if(currentPage==='dashboard'){ drawBarChart('weeklyChart', last7DaysData()); drawBarChart('monthlyChart', last30DaysData()); }
+    if(currentPage==='statistics'){ drawBarChart('statDaily', last7DaysData()); drawBarChart('statMonthly', last30DaysData()); drawBarChart('statYearly', yearlyXpData()); }
+  });
+
+  // Global safety net: prevent any uncaught error from breaking the whole app silently
+  window.addEventListener('error', (e)=>{ console.error('Global error caught:', e.error || e.message); });
+  window.addEventListener('unhandledrejection', (e)=>{ console.error('Unhandled promise rejection:', e.reason); });
+
+  saveState();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
